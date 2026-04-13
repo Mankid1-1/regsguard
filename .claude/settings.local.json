@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@15 . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(java -version)",
+      "Bash(echo ANDROID_HOME=$ANDROID_HOME)",
+      "Read(//c/Users/Brend/Desktop/Regsguard/$ANDROID_HOME/platform-tools/**)",
+      "Read(//c/Users/Brend/Desktop/Regsguard/$ANDROID_HOME/**)",
+      "Bash($ANDROID_HOME/emulator/emulator.exe -list-avds)",
+      "Bash(export JAVA_HOME=\"/c/Program Files/Java/jdk-17\")",
+      "Bash(export ANDROID_HOME=\"$LOCALAPPDATA/Android/Sdk\")",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$ANDROID_HOME/platform-tools:$PATH\")",
+      "Bash(npx react-native:*)",
+      "Bash(cmd.exe /c \"gradlew.bat app:installDebug -PreactNativeDevServerPort=8081\")",
+      "Bash(chmod +x gradlew)",
+      "Bash(./gradlew app:installDebug -PreactNativeDevServerPort=8081)",
+      "Bash(adb devices:*)",
+      "Bash(\"$JAVA_HOME/bin/java\" -version)",
+      "Bash(./gradlew.bat app:installDebug -PreactNativeDevServerPort=8081)",
+      "Bash(npm ls:*)",
+      "Bash(npm install:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx tsc:*)",
+      "Bash(cmd //c \"dir /b C:\\\\Users\\\\Brend\\\\Desktop\\\\Regsguard\\\\src\\\\components\\\\ui\\\\*oast* C:\\\\Users\\\\Brend\\\\Desktop\\\\Regsguard\\\\src\\\\components\\\\ui\\\\*adge*\")",
+      "Bash(mv toast.tsx toast_tmp.tsx)",
+      "Bash(mv toast_tmp.tsx toast.tsx)",
+      "Bash(mv badge.tsx badge_tmp.tsx)",
+      "Bash(mv badge_tmp.tsx badge.tsx)",
+      "Bash(break)",
+      "Bash(docker compose:*)",
+      "Bash(npx prisma:*)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(npm run:*)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //F //PID 21532)",
+      "Bash(find src/app/api -name \"*.ts\" -exec grep -l \"= rateLimit\\(\" {} \\\\;)",
+      "Bash(tasklist)",
+      "Bash(npx vitest:*)",
+      "Bash(npx next:*)"
+    ]
+  }
+}

@@ -1,0 +1,777 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───
+
+enum Role {
+  USER
+  ADMIN
+  OWNER
+  MANAGER
+  FIELD_WORKER
+  BOOKKEEPER
+}
+
+enum Trade {
+  PLUMBING
+  ELECTRICAL
+  HVAC
+  GENERAL
+  EPA
+  LEAD_SAFE
+}
+
+enum RenewalCycle {
+  ANNUAL
+  BIENNIAL
+  TRIENNIAL
+  FIVE_YEAR
+  ONE_TIME
+  VARIES
+}
+
+enum RegulationCategory {
+  LICENSE_RENEWAL
+  CONTINUING_EDUCATION
+  INSURANCE
+  BONDING
+  EPA_CERTIFICATION
+  SAFETY_TRAINING
+  PERMIT
+  REGISTRATION
+}
+
+enum DeadlineStatus {
+  UPCOMING
+  DUE_SOON
+  OVERDUE
+  COMPLETED
+  SKIPPED
+}
+
+enum ComplianceAction {
+  PDF_GENERATED
+  EMAIL_SENT
+  DEADLINE_COMPLETED
+  DEADLINE_CREATED
+  PROFILE_UPDATED
+  REGULATION_ADDED
+  DOCUMENT_CREATED
+  DOCUMENT_SENT
+  DOCUMENT_SIGNED
+  AUTO_FILED
+  CE_COMPLETED
+  FOLLOW_UP_SENT
+  BULK_GENERATED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  TRIALING
+}
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum DocumentCategory {
+  TAX
+  PERMIT
+  LIEN_WAIVER
+  INSURANCE
+  CONTRACT
+  CHANGE_ORDER
+  INVOICE
+  SAFETY
+  COMPLIANCE
+  PROPOSAL
+  CERTIFICATE
+  OTHER
+}
+
+enum DocumentStatus {
+  DRAFT
+  GENERATED
+  SENT
+  PENDING_SIGNATURE
+  SIGNED
+  FILED
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+enum NotificationType {
+  DEADLINE_ALERT
+  AUTO_FILED
+  DOCUMENT_SIGNED
+  PAYMENT_RECEIVED
+  CE_REMINDER
+  FOLLOW_UP
+  SYSTEM
+}
+
+enum SignatureStatus {
+  PENDING
+  SIGNED
+  DECLINED
+  EXPIRED
+}
+
+enum ExpenseCategory {
+  MATERIALS
+  LABOR
+  PERMITS
+  INSURANCE
+  EQUIPMENT
+  FUEL
+  OFFICE
+  OTHER
+}
+
+enum WebhookEvent {
+  DEADLINE_DUE
+  DOCUMENT_CREATED
+  DOCUMENT_SIGNED
+  COMPLIANCE_FILED
+  PAYMENT_RECEIVED
+}
+
+enum ProgramType {
+  WHITE_LABEL
+  REFERRAL
+  ASSOCIATION
+  ENTERPRISE
+}
+
+enum ProgramStatus {
+  PENDING
+  APPROVED
+  ACTIVE
+  SUSPENDED
+}
+
+// ─── (NextAuth models removed — auth handled by Clerk) ───
+
+// ─── Multi-Tenancy ───
+
+model Tenant {
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  domain         String?         @unique
+  logoUrl        String?
+  primaryColor   String          @default("#1e40af")
+  supportEmail   String?
+  fromEmail      String?
+  fromName       String?
+  active         Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  users          User[]
+  partnerProgram PartnerProgram?
+}
+
+// ─── Core User ───
+
+model User {
+  id                 String    @id @default(cuid())
+  clerkId            String    @unique
+  name               String?
+  email              String    @unique
+  image              String?
+  role               Role      @default(USER)
+  onboardingComplete Boolean   @default(false)
+  tenantId           String?
+  referralCode       String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  phone               String?
+  locale              String    @default("en")
+  darkMode            Boolean   @default(false)
+  calendarToken       String?   @unique
+
+  tenant          Tenant?          @relation(fields: [tenantId], references: [id])
+  businessProfile BusinessProfile?
+  userRegulations UserRegulation[]
+  userDeadlines   UserDeadline[]
+  complianceLogs  ComplianceLog[]
+  subscription    Subscription?
+  clients         Client[]
+  projects        Project[]
+  documents       Document[]
+  signatures      Signature[]
+  fileUploads     FileUpload[]
+  ceCredits       CECredit[]
+  notificationPrefs NotificationPreference?
+  notifications   Notification[]
+  teamMembers     TeamMember[]     @relation("TeamOwner")
+  memberOf        TeamMember[]     @relation("TeamWorker")
+  complianceShares ComplianceShare[]
+  expenses        Expense[]
+  apiKeys         ApiKey[]
+  webhooks        Webhook[]
+  jobPhotos       JobPhoto[]
+  followUps       ScheduledFollowUp[]
+
+  @@index([tenantId])
+}
+
+// ─── Business Profile ───
+
+model BusinessProfile {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  businessName          String
+  address               String
+  city                  String
+  state                 String
+  zip                   String
+  phone                 String
+  email                 String
+  responsiblePerson     String
+  taxId                 String?
+  licenseNumbers        Json      @default("{}")
+  insuranceProvider     String?
+  insurancePolicyNumber String?
+  insuranceExpiration   DateTime?
+  bondAmount            String?
+  bondProvider          String?
+  bondExpiration        DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Clients (GCs, Property Owners, etc.) ───
+
+model Client {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  companyName String?
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  state       String?
+  zip         String?
+  taxId       String?
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects  Project[]
+  documents Document[]
+
+  @@index([userId])
+}
+
+// ─── Projects / Jobs ───
+
+model Project {
+  id             String        @id @default(cuid())
+  userId         String
+  clientId       String?
+  name           String
+  description    String?       @db.Text
+  address        String?
+  city           String?
+  state          String?
+  zip            String?
+  startDate      DateTime?
+  endDate        DateTime?
+  contractAmount Float?
+  status         ProjectStatus @default(ACTIVE)
+  permitNumber   String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client    Client?    @relation(fields: [clientId], references: [id])
+  documents Document[]
+  photos    JobPhoto[]
+  expenses  Expense[]
+  followUps ScheduledFollowUp[]
+
+  @@index([userId])
+  @@index([clientId])
+}
+
+// ─── Documents (generated paperwork) ───
+
+model Document {
+  id           String           @id @default(cuid())
+  userId       String
+  clientId     String?
+  projectId    String?
+  templateSlug String
+  category     DocumentCategory
+  title        String
+  data         Json             @default("{}")
+  status       DocumentStatus   @default(DRAFT)
+  sentAt       DateTime?
+  sentTo       String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client     Client?     @relation(fields: [clientId], references: [id])
+  project    Project?    @relation(fields: [projectId], references: [id])
+  signatures Signature[]
+  files      FileUpload[]
+
+  @@index([userId])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([category])
+  @@index([templateSlug])
+  @@index([userId, status])
+}
+
+// ─── Regulations ───
+
+model Regulation {
+  id              String             @id @default(cuid())
+  trade           Trade
+  state           String             @db.VarChar(2)
+  title           String
+  description     String             @db.Text
+  authority       String
+  officialEmail   String?
+  portalUrl       String?
+  fee             String?
+  renewalCycle    RenewalCycle
+  category        RegulationCategory
+  defaultDueMonth Int?
+  defaultDueDay   Int?
+  notes           String?            @db.Text
+  active          Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  userRegulations UserRegulation[]
+  userDeadlines   UserDeadline[]
+  complianceLogs  ComplianceLog[]
+  ceCredits       CECredit[]
+
+  @@unique([trade, state, title], name: "trade_state_title")
+}
+
+model UserRegulation {
+  id           String   @id @default(cuid())
+  userId       String
+  regulationId String
+  customNotes  String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regulation Regulation @relation(fields: [regulationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, regulationId])
+  @@index([userId])
+  @@index([regulationId])
+}
+
+model UserDeadline {
+  id                    String         @id @default(cuid())
+  userId                String
+  regulationId          String
+  nextDueDate           DateTime
+  status                DeadlineStatus @default(UPCOMING)
+  lastNotifiedAt        DateTime?
+  lastNotifiedThreshold Int?
+  completedAt           DateTime?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regulation Regulation @relation(fields: [regulationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([regulationId])
+  @@index([nextDueDate])
+  @@index([status])
+  @@index([userId, status])
+  @@index([status, nextDueDate])
+}
+
+model ComplianceLog {
+  id           String           @id @default(cuid())
+  userId       String
+  regulationId String?
+  action       ComplianceAction
+  details      Json?
+  pdfUrl       String?
+  createdAt    DateTime         @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regulation Regulation? @relation(fields: [regulationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([regulationId])
+  @@index([createdAt])
+  @@index([userId, action])
+  @@index([userId, createdAt])
+}
+
+// ─── Billing ───
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Partnership Programmes ───
+
+model PartnerProgram {
+  id            String        @id @default(cuid())
+  type          ProgramType
+  status        ProgramStatus @default(PENDING)
+  companyName   String
+  contactName   String
+  contactEmail  String
+  phone         String?
+  website       String?
+  notes         String?       @db.Text
+  referralCode  String?       @unique
+  commissionPct Float         @default(0)
+  discountPct   Float         @default(0)
+  tenantId      String?       @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  tenant    Tenant?    @relation(fields: [tenantId], references: [id])
+  referrals Referral[]
+}
+
+model Referral {
+  id            String   @id @default(cuid())
+  programId     String
+  referredEmail String
+  referredUserId String?
+  status        String   @default("PENDING")
+  commission    Float    @default(0)
+  createdAt     DateTime @default(now())
+
+  program PartnerProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+  @@index([referredEmail])
+}
+
+// ─── E-Signatures ───
+
+model Signature {
+  id          String          @id @default(cuid())
+  documentId  String
+  userId      String
+  signerName  String
+  signerEmail String?
+  signatureData String        @db.Text
+  ipAddress   String?
+  userAgent   String?
+  status      SignatureStatus @default(PENDING)
+  signedAt    DateTime?
+  expiresAt   DateTime?
+  token       String          @unique @default(cuid())
+  createdAt   DateTime        @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([userId])
+  @@index([token])
+}
+
+// ─── File Uploads ───
+
+model FileUpload {
+  id         String   @id @default(cuid())
+  userId     String
+  documentId String?
+  fileName   String
+  fileType   String
+  fileSize   Int
+  filePath   String
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([documentId])
+}
+
+// ─── CE Credit Tracking ───
+
+model CECredit {
+  id           String    @id @default(cuid())
+  userId       String
+  regulationId String?
+  courseName   String
+  provider     String?
+  hours        Float
+  completedAt  DateTime
+  expiresAt    DateTime?
+  certificateUrl String?
+  notes        String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regulation Regulation? @relation(fields: [regulationId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([regulationId])
+}
+
+// ─── Notification Preferences ───
+
+model NotificationPreference {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  emailEnabled    Boolean @default(true)
+  smsEnabled      Boolean @default(false)
+  pushEnabled     Boolean @default(true)
+  inAppEnabled    Boolean @default(true)
+  smsPhone        String?
+  pushSubscription Json?
+  alertDays       Json    @default("[60, 30, 14, 7, 1]")
+  quietHoursStart String?
+  quietHoursEnd   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── In-App Notifications ───
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String           @db.Text
+  data      Json?
+  read      Boolean          @default(false)
+  readAt    DateTime?
+  channel   NotificationChannel @default(IN_APP)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([userId, read, createdAt])
+}
+
+// ─── Team / Employee Management ───
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  ownerId   String
+  memberId  String
+  role      Role     @default(FIELD_WORKER)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner  User @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  member User @relation("TeamWorker", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, memberId])
+  @@index([ownerId])
+  @@index([memberId])
+}
+
+// ─── Shareable Compliance Portal ───
+
+model ComplianceShare {
+  id         String    @id @default(cuid())
+  userId     String
+  token      String    @unique @default(cuid())
+  label      String?
+  expiresAt  DateTime?
+  viewCount  Int       @default(0)
+  lastViewedAt DateTime?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ─── Expenses ───
+
+model Expense {
+  id          String          @id @default(cuid())
+  userId      String
+  projectId   String?
+  category    ExpenseCategory
+  amount      Float
+  description String?
+  vendor      String?
+  receiptUrl  String?
+  receiptData Json?
+  date        DateTime
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([date])
+}
+
+// ─── API Keys & Webhooks (Enterprise) ───
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  keyHash     String    @unique
+  prefix      String
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([keyHash])
+}
+
+model Webhook {
+  id        String       @id @default(cuid())
+  userId    String
+  url       String
+  events    WebhookEvent[]
+  secret    String
+  active    Boolean      @default(true)
+  lastError String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
+
+  @@index([userId])
+}
+
+// ─── Job Photos ───
+
+model JobPhoto {
+  id          String   @id @default(cuid())
+  userId      String
+  projectId   String
+  filePath    String
+  caption     String?
+  latitude    Float?
+  longitude   Float?
+  takenAt     DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+// ─── Webhook Deliveries (retry tracking) ───
+
+model WebhookDelivery {
+  id          String       @id @default(cuid())
+  webhookId   String
+  event       WebhookEvent
+  payload     Json
+  status      String       @default("PENDING")
+  attempts    Int          @default(0)
+  maxAttempts Int          @default(5)
+  lastError   String?      @db.Text
+  nextRetryAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextRetryAt])
+  @@index([webhookId])
+}
+
+// ─── Admin Audit Log ───
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  target    String
+  details   Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ─── Scheduled Follow-Ups ───
+
+model ScheduledFollowUp {
+  id          String    @id @default(cuid())
+  userId      String
+  projectId   String?
+  clientEmail String?
+  clientPhone String?
+  message     String    @db.Text
+  scheduledAt DateTime
+  sentAt      DateTime?
+  channel     NotificationChannel @default(EMAIL)
+  createdAt   DateTime  @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([scheduledAt])
+  @@index([scheduledAt, sentAt])
+}

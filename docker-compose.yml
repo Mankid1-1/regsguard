@@ -1,0 +1,70 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: regsguard_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-regsguard}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-regsguard}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-regsguard}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - regsguard
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: regsguard_app
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-regsguard}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-regsguard}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_MONTHLY: ${STRIPE_PRICE_MONTHLY:-}
+      STRIPE_PRICE_ANNUAL: ${STRIPE_PRICE_ANNUAL:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      CRON_SECRET: ${CRON_SECRET:-}
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+    depends_on:
+      postgres:
+        condition: service_healthy
+    shm_size: "1gb"
+    networks:
+      - regsguard
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: regsguard_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/certbot:/var/www/certbot:ro
+    depends_on:
+      - app
+    networks:
+      - regsguard
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+networks:
+  regsguard:
+    driver: bridge
