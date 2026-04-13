@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { MobileNav } from "@/components/layout/mobile-nav";
@@ -9,13 +10,24 @@ import { ToastProvider } from "@/components/ui/toast";
 interface DashboardShellProps {
   children: React.ReactNode;
   userRole?: string;
+  onboardingComplete?: boolean;
 }
 
 export function DashboardShell({
   children,
   userRole,
+  onboardingComplete = true,
 }: DashboardShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Redirect to onboarding if not complete (unless already there)
+  useEffect(() => {
+    if (!onboardingComplete && !pathname.startsWith("/onboarding")) {
+      router.replace("/onboarding");
+    }
+  }, [onboardingComplete, pathname, router]);
 
   return (
     <ToastProvider>

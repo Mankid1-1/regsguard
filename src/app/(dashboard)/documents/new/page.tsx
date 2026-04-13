@@ -57,7 +57,12 @@ export default function NewDocumentPage() {
     setSelected(t);
     setTitle(t.name);
     setFormData({});
-    // TODO: auto-fill from profile/client/project will be done server-side
+    // Auto-fill immediately from profile
+    const params = new URLSearchParams({ templateSlug: t.slug });
+    fetch(`/api/documents/autofill?${params.toString()}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((filled) => { if (filled) setFormData(filled); })
+      .catch(() => {});
   }
 
   function setField(key: string, value: string) {

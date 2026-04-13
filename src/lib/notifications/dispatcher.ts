@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/email/send-email";
 import type { NotificationType } from "@prisma/client";
 
 /**
@@ -28,8 +29,8 @@ export async function createNotification(
  * Dispatches a notification across all channels the user has enabled.
  *
  * - Always creates an IN_APP notification.
- * - Checks the user's NotificationPreference for email / SMS / push and
- *   dispatches accordingly (stubs for now -- just logs).
+ * - Sends email via Resend if user has email notifications enabled.
+ * - Logs SMS/push for future integration.
  */
 export async function dispatchNotification(
   userId: string,
@@ -41,43 +42,51 @@ export async function dispatchNotification(
   // Always create the in-app notification
   const notification = await createNotification(userId, type, title, body, data);
 
-  // Fetch the user's preferences (or use defaults)
-  let prefs = await prisma.notificationPreference.findUnique({
-    where: { userId },
+  // Fetch user email + preferences
+  const [user, existingPrefs] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { email: true } }),
+    prisma.notificationPreference.findUnique({ where: { userId } }),
+  ]);
+
+  const prefs = existingPrefs ?? await prisma.notificationPreference.create({
+    data: {
+      userId,
+      emailEnabled: true,
+      smsEnabled: false,
+      pushEnabled: true,
+      inAppEnabled: true,
+      alertDays: [60, 30, 14, 7, 1],
+    },
   });
 
-  if (!prefs) {
-    // Create default preferences if none exist
-    prefs = await prisma.notificationPreference.create({
-      data: {
-        userId,
-        emailEnabled: true,
-        smsEnabled: false,
-        pushEnabled: true,
-        inAppEnabled: true,
-        alertDays: [60, 30, 14, 7, 1],
-      },
-    });
+  // Email channel -- send via Resend
+  if (prefs.emailEnabled && user?.email) {
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: `RegsGuard: ${title}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px">
+            <h2 style="color:#1a1a1a;margin:0 0 8px">${title}</h2>
+            <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 20px">${body}</p>
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://regsguard.vercel.app"}/dashboard"
+               style="display:inline-block;background:#2563eb;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600">
+              Open Dashboard
+            </a>
+            <p style="color:#999;font-size:12px;margin-top:24px">
+              You&rsquo;re receiving this because you have email notifications enabled in RegsGuard.
+            </p>
+          </div>
+        `,
+      });
+    } catch (err) {
+      console.error(`[NOTIFICATION:EMAIL] Failed for user ${userId}:`, err);
+    }
   }
 
-  // Email channel
-  if (prefs.emailEnabled) {
-    // Stub: In production this would call the email service
-    console.log(`[NOTIFICATION:EMAIL] To user ${userId}: "${title}" - ${body}`);
-  }
-
-  // SMS channel
+  // SMS channel -- log for future Twilio integration
   if (prefs.smsEnabled && prefs.smsPhone) {
-    // Stub: In production this would call Twilio / SMS provider
-    console.log(
-      `[NOTIFICATION:SMS] To ${prefs.smsPhone} (user ${userId}): "${title}" - ${body}`
-    );
-  }
-
-  // Push channel
-  if (prefs.pushEnabled) {
-    // Stub: In production this would send a web push notification
-    console.log(`[NOTIFICATION:PUSH] To user ${userId}: "${title}" - ${body}`);
+    console.log(`[NOTIFICATION:SMS] To ${prefs.smsPhone}: "${title}"`);
   }
 
   return notification;

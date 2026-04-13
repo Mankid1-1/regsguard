@@ -14,14 +14,14 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
-  // Get the user's role from our DB for the sidebar
+  // Get the user's role and onboarding status from our DB
   const user = await prisma.user.findUnique({
     where: { clerkId: userId },
-    select: { role: true },
+    select: { role: true, onboardingComplete: true },
   });
 
   return (
-    <DashboardShell userRole={user?.role}>
+    <DashboardShell userRole={user?.role} onboardingComplete={user?.onboardingComplete ?? false}>
       {children}
     </DashboardShell>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -27,6 +28,7 @@ const STEP_LABELS = ["Select Trades", "Select States", "Confirm Regulations", "B
 export default function OnboardingPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { user: clerkUser } = useUser();
 
   const [step, setStep] = useState(1);
   const [selectedTrades, setSelectedTrades] = useState<TradeValue[]>([]);
@@ -55,6 +57,23 @@ export default function OnboardingPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Pre-fill profile from Clerk user data + selected state
+  useEffect(() => {
+    if (clerkUser && !profile.email) {
+      setProfile((prev) => ({
+        ...prev,
+        email: prev.email || clerkUser.primaryEmailAddress?.emailAddress || "",
+        responsiblePerson: prev.responsiblePerson || clerkUser.fullName || "",
+      }));
+    }
+  }, [clerkUser, profile.email]);
+
+  useEffect(() => {
+    if (selectedStates.length === 1 && !profile.state) {
+      setProfile((prev) => ({ ...prev, state: selectedStates[0] }));
+    }
+  }, [selectedStates, profile.state]);
 
   // Fetch regulations when entering step 3
   const fetchRegulations = useCallback(async () => {

@@ -6,6 +6,8 @@ import { StatsOverview } from "@/components/dashboard/stats-overview";
 import { DeadlineList } from "@/components/dashboard/deadline-list";
 import { CalendarView } from "@/components/dashboard/calendar-view";
 import { FilingHistory } from "@/components/dashboard/filing-history";
+import { FilingPipeline } from "@/components/dashboard/filing-pipeline";
+import { SetupChecklist } from "@/components/dashboard/setup-checklist";
 import { ComplianceScore } from "@/components/dashboard/compliance-score";
 import { ExportButton } from "@/components/export/export-button";
 import type { DeadlineStatus } from "@prisma/client";
@@ -28,38 +30,39 @@ export default async function DashboardPage() {
   const ninetyDaysOut = new Date();
   ninetyDaysOut.setDate(ninetyDaysOut.getDate() + 90);
 
-  // Fetch recent compliance activity
-  const recentActivity = await prisma.complianceLog.findMany({
-    where: { userId },
-    include: {
-      regulation: { select: { title: true, authority: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-  });
-
-  const deadlines = await prisma.userDeadline.findMany({
-    where: {
-      userId,
-    },
-    include: {
-      regulation: {
-        select: {
-          id: true,
-          title: true,
-          authority: true,
-          trade: true,
-          state: true,
-          fee: true,
-          portalUrl: true,
-          category: true,
+  // Parallel fetch: activity, deadlines, setup status
+  const [recentActivity, deadlines, profile, regulationCount, documentCount] = await Promise.all([
+    prisma.complianceLog.findMany({
+      where: { userId },
+      include: {
+        regulation: { select: { title: true, authority: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    prisma.userDeadline.findMany({
+      where: { userId },
+      include: {
+        regulation: {
+          select: {
+            id: true,
+            title: true,
+            authority: true,
+            trade: true,
+            state: true,
+            fee: true,
+            portalUrl: true,
+            officialEmail: true,
+            category: true,
+          },
         },
       },
-    },
-    orderBy: {
-      nextDueDate: "asc",
-    },
-  });
+      orderBy: { nextDueDate: "asc" },
+    }),
+    prisma.businessProfile.findUnique({ where: { userId }, select: { id: true } }),
+    prisma.userRegulation.count({ where: { userId } }),
+    prisma.document.count({ where: { userId } }),
+  ]);
 
   // Compute live status for each deadline based on current date
   const deadlinesWithStatus = deadlines.map((d) => {
@@ -104,6 +107,14 @@ export default async function DashboardPage() {
       </div>
 
       <div className="space-y-6">
+        {/* Setup checklist for new users */}
+        <SetupChecklist
+          hasProfile={!!profile}
+          regulationCount={regulationCount}
+          deadlineCount={deadlines.length}
+          documentCount={documentCount}
+        />
+
         {/* Top row: compliance score + stats at a glance */}
         <div className="grid gap-4 md:grid-cols-4">
           <ComplianceScore />
@@ -120,9 +131,19 @@ export default async function DashboardPage() {
         {/* Main content: upcoming deadlines (what matters most) */}
         <DeadlineList deadlines={listDeadlines} />
 
-        {/* Secondary: calendar + recent activity side by side */}
+        {/* Pipeline + calendar + history */}
         <div className="grid gap-6 lg:grid-cols-2">
-          <CalendarView deadlines={deadlinesWithStatus} />
+          <FilingPipeline
+            deadlines={deadlinesWithStatus
+              .filter((d) => d.status !== "COMPLETED" && d.status !== "SKIPPED")
+              .map((d) => ({
+                ...d,
+                regulation: {
+                  ...d.regulation,
+                  officialEmail: (d.regulation as Record<string, unknown>).officialEmail as string | null,
+                },
+              }))}
+          />
           <FilingHistory
             activity={recentActivity.map((a) => ({
               id: a.id,
@@ -133,6 +154,9 @@ export default async function DashboardPage() {
             }))}
           />
         </div>
+
+        {/* Calendar view */}
+        <CalendarView deadlines={deadlinesWithStatus} />
       </div>
     </div>
   );

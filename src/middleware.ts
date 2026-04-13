@@ -25,8 +25,6 @@ const isPublicRoute = createRouteMatcher([
 const isSigningRoute = createRouteMatcher(["/api/documents/:id/sign/:token"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { pathname } = req.nextUrl;
-
   // Detect tenant from hostname
   const hostname = req.headers.get("host") || "";
   const tenantSlug = slugFromHostname(hostname);
