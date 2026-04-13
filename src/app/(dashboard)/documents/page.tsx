@@ -44,7 +44,10 @@ export default function DocumentsPage() {
   async function load() {
     setLoading(true);
     const res = await fetch("/api/documents");
-    if (res.ok) setDocs(await res.json());
+    if (res.ok) {
+      const json = await res.json();
+      setDocs(json.data ?? json);
+    }
     setLoading(false);
   }
 

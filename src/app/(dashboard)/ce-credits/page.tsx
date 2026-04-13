@@ -39,7 +39,7 @@ export default function CECreditsPage() {
       const res = await fetch("/api/ce-credits");
       if (res.ok) {
         const data = await res.json();
-        setCredits(data.credits);
+        setCredits(data.data ?? data.credits);
       }
     } catch {
       // handled by empty state

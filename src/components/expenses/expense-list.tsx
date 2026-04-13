@@ -89,7 +89,7 @@ export function ExpenseList({ refreshKey = 0, projects = [] }: ExpenseListProps)
       const res = await fetch(`/api/expenses?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        setExpenses(data.expenses);
+        setExpenses(data.data ?? data.expenses);
         setTotalAmount(data.totalAmount);
       }
     } catch {
