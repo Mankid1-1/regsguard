@@ -1,16 +1,20 @@
 import { logger } from "@/lib/logger";
 import fs from "fs/promises";
 import path from "path";
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-interface UploadParams {
+export interface UploadParams {
   key: string;
-  body: Buffer;
+  body: Buffer | string;
   contentType: string;
+  metadata?: Record<string, string>;
 }
 
-interface UploadResult {
-  url: string;
+export interface UploadResult {
   key: string;
+  url: string;
+  etag?: string;
 }
 
 interface StorageProvider {
@@ -41,8 +45,6 @@ class S3Storage implements StorageProvider {
     this.bucket = process.env.S3_BUCKET!;
     this.publicUrl = process.env.S3_PUBLIC_URL || `${endpoint}/${this.bucket}`;
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { S3Client } = require("@aws-sdk/client-s3") as typeof import("@aws-sdk/client-s3");
 
     this.client = new S3Client({
       endpoint,
@@ -56,8 +58,6 @@ class S3Storage implements StorageProvider {
   }
 
   async upload(params: UploadParams): Promise<UploadResult> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { PutObjectCommand } = require("@aws-sdk/client-s3") as typeof import("@aws-sdk/client-s3");
 
     await this.client.send(
       new PutObjectCommand({
@@ -77,10 +77,6 @@ class S3Storage implements StorageProvider {
   }
 
   async getSignedUrl(key: string): Promise<string> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { GetObjectCommand } = require("@aws-sdk/client-s3") as typeof import("@aws-sdk/client-s3");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getSignedUrl } = require("@aws-sdk/s3-request-presigner") as typeof import("@aws-sdk/s3-request-presigner");
 
     const url = await getSignedUrl(
       this.client,
@@ -92,8 +88,6 @@ class S3Storage implements StorageProvider {
   }
 
   async delete(key: string): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { DeleteObjectCommand } = require("@aws-sdk/client-s3") as typeof import("@aws-sdk/client-s3");
 
     await this.client.send(
       new DeleteObjectCommand({ Bucket: this.bucket, Key: key })

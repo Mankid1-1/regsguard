@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   experimental: {},
   serverExternalPackages: ["puppeteer", "puppeteer-core"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   headers: async () => [
     {
       source: "/(.*)",

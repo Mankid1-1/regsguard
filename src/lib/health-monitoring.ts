@@ -5,6 +5,9 @@
 
 import { prisma } from "./prisma";
 import { createAppError, logError } from "./error-handling";
+import Stripe from 'stripe';
+import puppeteer from 'puppeteer';
+import { promises as fs } from 'fs';
 
 export interface HealthCheck {
   service: string;
@@ -171,7 +174,7 @@ export class HealthMonitor {
       }
 
       // Test Stripe API with a simple balance check
-      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
       const responseTime = Date.now() - startTime;
       
       await stripe.balance.retrieve();
@@ -311,8 +314,7 @@ export class HealthMonitor {
     const startTime = Date.now();
     
     try {
-      const fs = require('fs');
-      const stats = fs.statSync(process.cwd());
+      const stats = await fs.stat(process.cwd());
       
       // Simple check - in production you'd want actual disk space monitoring
       const responseTime = Date.now() - startTime;
