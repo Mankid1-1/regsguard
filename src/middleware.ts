@@ -70,7 +70,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // CSRF protection for state-changing requests
-  const csrfCheck = csrfProtectionMiddleware(req);
+  const csrfCheck = CSRFProtection(req);
   if (csrfCheck) {
     return csrfCheck;
   }
