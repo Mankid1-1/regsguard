@@ -16,6 +16,35 @@ const createSchema = z.object({
   data: z.record(z.string(), z.string()).default({}),
 });
 
+async function validateOwnership(userId: string, clientId?: string | null, projectId?: string | null): Promise<string | null> {
+  if (clientId) {
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+      select: { userId: true },
+    });
+    if (!client || client.userId !== userId) {
+      return "You do not own this client";
+    }
+  }
+
+  if (projectId) {
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      select: { userId: true, clientId: true },
+    });
+    if (!project || project.userId !== userId) {
+      return "You do not own this project";
+    }
+
+    // If both clientId and projectId exist, verify project belongs to client
+    if (clientId && project.clientId !== clientId) {
+      return "Project does not belong to the specified client";
+    }
+  }
+
+  return null;
+}
+
 export async function GET(request: NextRequest) {
   const user = await getDbUser();
   if (!user) {
@@ -72,6 +101,12 @@ export async function POST(request: NextRequest) {
   const template = getTemplate(parsed.data.templateSlug);
   if (!template) {
     return NextResponse.json({ error: "Template not found" }, { status: 404 });
+  }
+
+  // Validate ownership of referenced client/project
+  const ownershipError = await validateOwnership(user.id, parsed.data.clientId, parsed.data.projectId);
+  if (ownershipError) {
+    return NextResponse.json({ error: ownershipError }, { status: 400 });
   }
 
   const doc = await prisma.document.create({

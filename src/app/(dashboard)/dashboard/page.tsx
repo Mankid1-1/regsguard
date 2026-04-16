@@ -10,6 +10,9 @@ import { FilingPipeline } from "@/components/dashboard/filing-pipeline";
 import { SetupChecklist } from "@/components/dashboard/setup-checklist";
 import { ComplianceScore } from "@/components/dashboard/compliance-score";
 import { ExportButton } from "@/components/export/export-button";
+import { AutoRenewalStatus } from "@/components/dashboard/auto-renewal-status";
+import { QuickActions } from "@/components/dashboard/quick-actions";
+import { ComplianceInsights } from "@/components/dashboard/compliance-insights";
 import type { DeadlineStatus } from "@prisma/client";
 import type { Metadata } from "next";
 
@@ -64,8 +67,11 @@ export default async function DashboardPage() {
     prisma.document.count({ where: { userId } }),
   ]);
 
+  // Auto-renewal configs will be empty until migration is run
+  const autoRenewalConfigs: any[] = [];
+
   // Compute live status for each deadline based on current date
-  const deadlinesWithStatus = deadlines.map((d) => {
+  const deadlinesWithStatus = deadlines.map((d: any) => {
     let status: DeadlineStatus = d.status;
     if (status !== "COMPLETED" && status !== "SKIPPED") {
       const daysLeft = getDaysUntil(d.nextDueDate);
@@ -87,23 +93,26 @@ export default async function DashboardPage() {
   });
 
   // Filter to next 90 days for the list (include overdue always)
-  const listDeadlines = deadlinesWithStatus.filter((d) => {
+  const listDeadlines = deadlinesWithStatus.filter((d: any) => {
     if (d.status === "COMPLETED" || d.status === "SKIPPED") return false;
     const dueDate = new Date(d.nextDueDate);
     return dueDate <= ninetyDaysOut || d.status === "OVERDUE";
   });
 
   // Stats
-  const upcoming = deadlinesWithStatus.filter((d) => d.status === "UPCOMING").length;
-  const dueSoon = deadlinesWithStatus.filter((d) => d.status === "DUE_SOON").length;
-  const overdue = deadlinesWithStatus.filter((d) => d.status === "OVERDUE").length;
-  const completed = deadlinesWithStatus.filter((d) => d.status === "COMPLETED").length;
+  const upcoming = deadlinesWithStatus.filter((d: any) => d.status === "UPCOMING").length;
+  const dueSoon = deadlinesWithStatus.filter((d: any) => d.status === "DUE_SOON").length;
+  const overdue = deadlinesWithStatus.filter((d: any) => d.status === "OVERDUE").length;
+  const completed = deadlinesWithStatus.filter((d: any) => d.status === "COMPLETED").length;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <ExportButton />
+        <h1 className="text-2xl font-bold text-foreground">Compliance Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <QuickActions />
+          <ExportButton />
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -115,10 +124,10 @@ export default async function DashboardPage() {
           documentCount={documentCount}
         />
 
-        {/* Top row: compliance score + stats at a glance */}
-        <div className="grid gap-4 md:grid-cols-4">
+        {/* Top row: compliance score, stats, and auto-renewal status */}
+        <div className="grid gap-4 lg:grid-cols-4">
           <ComplianceScore />
-          <div className="md:col-span-3">
+          <div className="lg:col-span-2">
             <StatsOverview
               upcoming={upcoming}
               dueSoon={dueSoon}
@@ -126,26 +135,52 @@ export default async function DashboardPage() {
               completed={completed}
             />
           </div>
+          <AutoRenewalStatus 
+            configs={autoRenewalConfigs.map((config: any) => ({
+              id: config.id,
+              regulation: config.regulation,
+              enabled: config.enabled,
+              nextRenewalAt: config.nextRenewalAt?.toISOString() || '',
+              autoPay: config.autoPay,
+            }))}
+          />
         </div>
 
-        {/* Main content: upcoming deadlines (what matters most) */}
-        <DeadlineList deadlines={listDeadlines} />
+        {/* Compliance insights */}
+        <ComplianceInsights 
+          deadlines={deadlinesWithStatus}
+          autoRenewalCount={autoRenewalConfigs.filter(c => c.enabled).length}
+          totalRegulations={regulationCount}
+        />
 
-        {/* Pipeline + calendar + history */}
+        {/* Main content: upcoming deadlines with auto-renewal indicators */}
+        <DeadlineList 
+          deadlines={listDeadlines.map((d: any) => ({
+            ...d,
+            hasAutoRenewal: autoRenewalConfigs.some((c: any) => 
+              c.regulationId === d.regulation.id && c.enabled
+            ),
+          }))}
+        />
+
+        {/* Pipeline + calendar + history with enhanced data */}
         <div className="grid gap-6 lg:grid-cols-2">
           <FilingPipeline
             deadlines={deadlinesWithStatus
-              .filter((d) => d.status !== "COMPLETED" && d.status !== "SKIPPED")
-              .map((d) => ({
+              .filter((d: any) => d.status !== "COMPLETED" && d.status !== "SKIPPED")
+              .map((d: any) => ({
                 ...d,
                 regulation: {
                   ...d.regulation,
                   officialEmail: (d.regulation as Record<string, unknown>).officialEmail as string | null,
                 },
+                hasAutoRenewal: autoRenewalConfigs.some((c: any) => 
+                  c.regulationId === d.regulation.id && c.enabled
+                ),
               }))}
           />
           <FilingHistory
-            activity={recentActivity.map((a) => ({
+            activity={recentActivity.map((a: any) => ({
               id: a.id,
               action: a.action,
               createdAt: a.createdAt.toISOString(),
@@ -155,8 +190,15 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {/* Calendar view */}
-        <CalendarView deadlines={deadlinesWithStatus} />
+        {/* Calendar view with auto-renewal indicators */}
+        <CalendarView 
+          deadlines={deadlinesWithStatus.map((d: any) => ({
+            ...d,
+            hasAutoRenewal: autoRenewalConfigs.some((c: any) => 
+              c.regulationId === d.regulation.id && c.enabled
+            ),
+          }))}
+        />
       </div>
     </div>
   );

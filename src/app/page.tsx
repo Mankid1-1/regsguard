@@ -5,13 +5,13 @@ import { getTenantFromHeaders } from "@/lib/tenant.server";
 import { TenantLogo } from "@/components/ui/tenant-logo";
 
 export const metadata: Metadata = {
-  title: "RegsGuard - Never Miss a License Renewal Again",
+  title: "RegsGuard - MN/WI Trade Compliance Autopilot",
   description:
-    "Compliance tracking for plumbers, electricians, and HVAC pros. Auto-filled forms, deadline alerts, document generation, and one-click submissions. Start free.",
+    "Compliance tracking autopilot for plumbers, electricians, and HVAC professionals in Minnesota and Wisconsin. Auto-filled forms, deadline alerts, document generation. 14-day free trial.",
   openGraph: {
-    title: "RegsGuard - Compliance Made Simple for Trade Pros",
+    title: "RegsGuard - Compliance Autopilot for the Trades",
     description:
-      "Track every license, permit, and CE deadline. Auto-fill forms. Get reminded before it's too late. Built for the trades.",
+      "Stop chasing license renewals. RegsGuard tracks deadlines, sends reminders, and auto-generates compliance PDFs. Built for MN/WI plumbers, electricians, and HVAC pros.",
     type: "website",
   },
 };
@@ -29,17 +29,17 @@ export default async function HomePage() {
             <span className="text-xl font-bold">{tenant.name}</span>
           </div>
           <nav className="hidden items-center gap-6 md:flex">
-            <Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</Link>
-            <Link href="#trades" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Trades</Link>
+            <Link href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">How It Works</Link>
+            <Link href="#coverage" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Coverage</Link>
             <Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
-            <Link href="/partners" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Partners</Link>
+            <Link href="/partners" className="text-sm text-muted-foreground hover:text-foreground transition-colors">For Partners</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost" size="sm">Log in</Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm">Start Free Trial</Button>
+              <Button size="sm">Start Free</Button>
             </Link>
           </div>
         </div>
@@ -48,132 +48,79 @@ export default async function HomePage() {
       <main className="mx-auto max-w-6xl px-4">
         {/* Hero */}
         <section className="flex flex-col items-center py-20 text-center lg:py-28">
-          <div className="mb-4 inline-flex items-center rounded-full border border-border px-4 py-1.5 text-sm text-muted-foreground">
-            Trusted by 500+ trade professionals
+          <div className="mb-4 space-y-2 inline-flex flex-col items-center">
+            <div className="inline-flex items-center rounded-full border border-amber-200/50 bg-amber-50/50 px-4 py-1.5 text-sm text-amber-900">
+              📍 Minnesota & Wisconsin only
+            </div>
+            <div className="inline-flex items-center rounded-full border border-green-200/50 bg-green-50/50 px-4 py-1.5 text-sm text-green-900">
+              🔥 First 100 contractors: $19/mo for LIFE
+            </div>
           </div>
-          <h1 className="mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Never Miss a License Renewal Again
+          <h1 className="mb-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
+            Stop Chasing License Renewals
           </h1>
           <p className="mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            {tenant.name} tracks every compliance deadline for plumbers, electricians, and HVAC pros.
-            Auto-filled forms, one-click submissions, and alerts that actually work.
-            Set it up in 5 minutes, then forget about it.
+            Your compliance autopilot. Never miss a deadline. Auto-filled forms. One-click submissions. Email reminders that actually work.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/signup">
-              <Button size="lg" className="text-base px-8">Start Free Trial</Button>
+              <Button size="lg" className="text-base px-8">Start 14-Day Free Trial</Button>
             </Link>
-            <Link href="#features">
+            <Link href="#how-it-works">
               <Button variant="outline" size="lg" className="text-base px-8">See How It Works</Button>
             </Link>
+            <Link href="/audit">
+              <Button variant="secondary" size="lg" className="text-base px-8">Free Audit</Button>
+            </Link>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">14-day free trial. No credit card required.</p>
+          <p className="mt-4 text-sm text-muted-foreground">No credit card required. Cancel anytime.</p>
         </section>
 
-        {/* Stats Bar */}
-        <section className="grid grid-cols-2 gap-4 rounded-2xl border border-border bg-muted/30 p-8 sm:grid-cols-4 mb-16">
-          {[
-            { stat: "17", label: "Document Templates" },
-            { stat: "50+", label: "Regulations Tracked" },
-            { stat: "99.9%", label: "Uptime SLA" },
-            { stat: "5 min", label: "Average Setup Time" },
-          ].map((item) => (
-            <div key={item.label} className="text-center">
-              <div className="text-2xl font-bold sm:text-3xl">{item.stat}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{item.label}</div>
+        {/* How It Works (3-Step) */}
+        <section id="how-it-works" className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3">How It Works</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Three steps to compliance peace of mind.</p>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-3">
+            <div className="rounded-xl border border-border p-8 text-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold text-lg mb-4">1</div>
+              <h3 className="mb-3 text-lg font-semibold">Enter Your Info Once</h3>
+              <p className="text-sm text-muted-foreground">Your business details auto-fill every form, PDF, and submission. Set it and forget it.</p>
             </div>
-          ))}
-        </section>
-
-        {/* Features Grid */}
-        <section id="features" className="py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Everything You Need to Stay Compliant</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">From deadline tracking to document generation, we handle the compliance paperwork so you can focus on the job.</p>
-          </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "One-Time Setup",
-                desc: "Enter your business info once. It auto-fills every form, PDF, and submission forever.",
-                icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
-              },
-              {
-                title: "Smart Deadline Tracking",
-                desc: "Color-coded calendar shows everything due in the next 90 days. Red, yellow, green -- at a glance.",
-                icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-              },
-              {
-                title: "One-Click PDF & Send",
-                desc: "Generate pre-filled compliance PDFs and email them directly to the right government office.",
-                icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
-              },
-              {
-                title: "Automatic Alerts",
-                desc: "Email reminders at 60, 30, 14, 7, and 1 day before every deadline. Zero false alarms.",
-                icon: "M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9",
-              },
-              {
-                title: "17 Document Templates",
-                desc: "W-9s, 1099s, lien waivers, COIs, invoices, change orders, permits -- auto-filled and ready to send.",
-                icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-              },
-              {
-                title: "E-Signatures",
-                desc: "Built-in signature capture. Send documents for signing and track status in real-time.",
-                icon: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z",
-              },
-              {
-                title: "Compliance Score",
-                desc: "Know your compliance health at a glance. A-F grade across deadlines, CE credits, insurance, and filings.",
-                icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-              },
-              {
-                title: "Works on Any Device",
-                desc: "Install on your phone like a native app. Works offline too. Perfect for the job site.",
-                icon: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z",
-              },
-              {
-                title: "Team Management",
-                desc: "Add field workers, bookkeepers, and managers. Role-based access keeps everyone in their lane.",
-                icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
-              },
-            ].map((feature) => (
-              <div key={feature.title} className="rounded-xl border border-border p-6 hover:border-primary/30 transition-colors">
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={feature.icon} />
-                  </svg>
-                </div>
-                <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
-              </div>
-            ))}
+            <div className="rounded-xl border border-border p-8 text-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 font-bold text-lg mb-4">2</div>
+              <h3 className="mb-3 text-lg font-semibold">Get Smart Reminders</h3>
+              <p className="text-sm text-muted-foreground">Alerts at 60, 30, 14, 7, and 1 day before deadlines. Color-coded calendar view.</p>
+            </div>
+            <div className="rounded-xl border border-border p-8 text-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-purple-600 font-bold text-lg mb-4">3</div>
+              <h3 className="mb-3 text-lg font-semibold">One-Click Submit</h3>
+              <p className="text-sm text-muted-foreground">Auto-fill PDFs and email them to the right government office in seconds.</p>
+            </div>
           </div>
         </section>
 
-        {/* Trade Coverage */}
-        <section id="trades" className="py-16">
+        {/* Coverage (Trade & State) */}
+        <section id="coverage" className="py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Built for Your Trade</h2>
-            <p className="text-muted-foreground">Pre-loaded with current 2026 regulations across all major trades and jurisdictions.</p>
+            <h2 className="text-3xl font-bold mb-3">What We Track</h2>
+            <p className="text-muted-foreground">Current 2026 regulations for MN/WI trade professionals.</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { trade: "Plumbing", items: ["Journeyman/Master licenses", "Backflow certifier", "Medical gas brazer"] },
-              { trade: "Electrical", items: ["Journeyman/Master licenses", "Power limited technician", "Elevator constructor"] },
-              { trade: "HVAC", items: ["HVAC contractor license", "Refrigerant handling (EPA 608)", "Boiler operator"] },
-              { trade: "General", items: ["General contractor license", "Building official cert", "Project management"] },
-              { trade: "EPA / Lead-Safe", items: ["EPA Lead Renovator (RRP)", "Lead abatement worker", "Lead inspector/assessor"] },
-              { trade: "Safety", items: ["OSHA 10/30", "First aid/CPR", "Confined space entry"] },
+              { trade: "Plumbing", items: ["Journeyman/Master licenses", "Backflow certifier", "Medical gas brazer", "Uniform plumbing code compliance"] },
+              { trade: "Electrical", items: ["Journeyman/Master licenses", "Power limited technician", "Elevator constructor", "Low voltage technician"] },
+              { trade: "HVAC", items: ["HVAC contractor license", "EPA 608 refrigerant handling", "Boiler operator", "Fire protection technician"] },
+              { trade: "General", items: ["General contractor license", "Building official cert", "Project manager license", "Safety manager certification"] },
             ].map((t) => (
               <div key={t.trade} className="rounded-xl border border-border p-6">
-                <h3 className="font-semibold mb-3">{t.trade}</h3>
-                <ul className="space-y-1.5">
+                <h3 className="font-semibold mb-3 text-base">{t.trade}</h3>
+                <ul className="space-y-2">
                   {t.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <svg className="h-4 w-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <svg className="h-4 w-4 text-green-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                       {item}
                     </li>
@@ -182,39 +129,49 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+          <div className="mt-12 rounded-xl bg-blue-50 border border-blue-200 p-8 text-center">
+            <p className="text-sm text-blue-900 mb-2">Verification Features Available</p>
+            <p className="text-muted-foreground text-sm mb-4">License, insurance, and bond checks run in simulated mode unless configured. All results clearly labeled.</p>
+            <div className="flex gap-4 justify-center text-sm">
+              <span className="px-3 py-1 rounded-full bg-white border border-blue-200">License checks</span>
+              <span className="px-3 py-1 rounded-full bg-white border border-blue-200">Insurance verification</span>
+              <span className="px-3 py-1 rounded-full bg-white border border-blue-200">Bond checks</span>
+            </div>
+          </div>
         </section>
 
-        {/* Testimonials */}
+        {/* Proof (Templates + Results) */}
         <section className="py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">What Trade Pros Say</h2>
+            <h2 className="text-3xl font-bold mb-3">What You Get</h2>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                quote: "I used to get hit with late fees every other year. Haven't missed a renewal since I started using RegsGuard.",
-                name: "Mike D.",
-                role: "Master Plumber, Minneapolis",
-              },
-              {
-                quote: "The auto-filled W-9s and lien waivers alone save me 2 hours a week. Everything's pre-populated from my profile.",
-                name: "Sarah K.",
-                role: "Electrical Contractor, Milwaukee",
-              },
-              {
-                quote: "My bookkeeper loves the expense tracking and CSV exports. Tax season went from a nightmare to a breeze.",
-                name: "Tom R.",
-                role: "HVAC Business Owner, St. Paul",
-              },
-            ].map((t) => (
-              <div key={t.name} className="rounded-xl border border-border p-6">
-                <p className="text-sm text-muted-foreground mb-4 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-                <div>
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-8 sm:grid-cols-2">
+            <div className="rounded-xl border border-border p-8">
+              <h3 className="font-semibold mb-4">17 Document Templates</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                {["W-9 / 1099 forms", "Lien waivers", "Certificate of Insurance", "Invoices", "Change orders", "Contract templates", "Proposals", "Safety compliance docs"].map((doc) => (
+                  <li key={doc} className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {doc}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-xl border border-border p-8">
+              <h3 className="font-semibold mb-4">Smart Features</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                {["Auto-fill all fields from your profile", "90-day deadline calendar", "Color-coded priority (red/yellow/green)", "E-signature capture", "CSV/PDF export", "Offline access (PWA)", "Team member roles", "Compliance score"].map((feat) => (
+                  <li key={feat} className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -230,18 +187,18 @@ export default async function HomePage() {
                 <span className="text-muted-foreground">/mo</span>
               </div>
               <ul className="mb-6 space-y-2 text-sm text-muted-foreground text-left">
-                <li>All features included</li>
-                <li>Unlimited documents</li>
-                <li>Email + SMS alerts</li>
-                <li>Team management</li>
+                <li>✓ All features</li>
+                <li>✓ Unlimited documents</li>
+                <li>✓ Email alerts</li>
+                <li>✓ Team access</li>
               </ul>
               <Link href="/signup" className="block">
-                <Button className="w-full">Get Started</Button>
+                <Button className="w-full">Start Free Trial</Button>
               </Link>
             </div>
             <div className="rounded-xl border-2 border-primary p-8 relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-medium text-primary-foreground">
-                Best Value
+                Save $58/year
               </div>
               <h3 className="text-lg font-semibold">Annual</h3>
               <div className="my-4">
@@ -249,13 +206,13 @@ export default async function HomePage() {
                 <span className="text-muted-foreground">/yr</span>
               </div>
               <ul className="mb-6 space-y-2 text-sm text-muted-foreground text-left">
-                <li>Everything in Monthly</li>
-                <li>Save $58/year (2 months free)</li>
-                <li>Priority support</li>
-                <li>API access</li>
+                <li>✓ Everything monthly</li>
+                <li>✓ 2 months free</li>
+                <li>✓ Priority support</li>
+                <li>✓ API access</li>
               </ul>
               <Link href="/signup" className="block">
-                <Button className="w-full">Get Started</Button>
+                <Button className="w-full">Start Free Trial</Button>
               </Link>
             </div>
           </div>
@@ -264,9 +221,9 @@ export default async function HomePage() {
         {/* CTA */}
         <section className="py-16 text-center">
           <div className="rounded-2xl bg-primary/5 border border-primary/20 p-12">
-            <h2 className="text-3xl font-bold mb-4">Ready to Stop Worrying About Compliance?</h2>
+            <h2 className="text-3xl font-bold mb-4">Ready to Stop Missing Deadlines?</h2>
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-              Join hundreds of trade professionals who trust {tenant.name} to keep their licenses current and their paperwork in order.
+              Hundreds of MN/WI contractors trust RegsGuard to keep their licenses current.
             </p>
             <Link href="/signup">
               <Button size="lg" className="text-base px-8">Start Your Free Trial</Button>
@@ -276,7 +233,7 @@ export default async function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border">
+      <footer className="border-t border-border mt-20">
         <div className="mx-auto max-w-6xl px-4 py-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
@@ -285,21 +242,21 @@ export default async function HomePage() {
                 <span className="font-bold">{tenant.name}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Compliance tracking built for the trades. Never miss a deadline again.
+                Compliance autopilot for plumbers, electricians, and HVAC pros in Minnesota and Wisconsin.
               </p>
             </div>
             <div>
               <h4 className="font-semibold mb-3 text-sm">Product</h4>
               <div className="space-y-2">
-                <Link href="#features" className="block text-sm text-muted-foreground hover:text-foreground">Features</Link>
+                <Link href="#how-it-works" className="block text-sm text-muted-foreground hover:text-foreground">How It Works</Link>
+                <Link href="#coverage" className="block text-sm text-muted-foreground hover:text-foreground">Coverage</Link>
                 <Link href="#pricing" className="block text-sm text-muted-foreground hover:text-foreground">Pricing</Link>
-                <Link href="#trades" className="block text-sm text-muted-foreground hover:text-foreground">Trades</Link>
               </div>
             </div>
             <div>
               <h4 className="font-semibold mb-3 text-sm">Company</h4>
               <div className="space-y-2">
-                <Link href="/partners" className="block text-sm text-muted-foreground hover:text-foreground">Partners</Link>
+                <Link href="/partners" className="block text-sm text-muted-foreground hover:text-foreground">Partner Program</Link>
               </div>
             </div>
             <div>
@@ -312,7 +269,7 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} {tenant.name}. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} {tenant.name}. All rights reserved. | Minnesota & Wisconsin only.</p>
           </div>
         </div>
       </footer>

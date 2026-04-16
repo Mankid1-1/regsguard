@@ -8,12 +8,22 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "seed": "npx tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
+    "db:pull": "prisma db pull",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy": "scripts/deploy.bat",
+    "deploy:seed": "scripts/deploy.bat --seed",
+    "setup:vercel": "bash scripts/setup-vercel.sh",
+    "test:deploy": "bash scripts/test-deployment.sh",
+    "vercel:build": "prisma generate && next build",
+    "vercel:start": "next start"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

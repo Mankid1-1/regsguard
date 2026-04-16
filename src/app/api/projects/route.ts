@@ -21,6 +21,19 @@ const projectSchema = z.object({
   permitNumber: z.string().optional().nullable(),
 });
 
+async function validateProjectOwnership(userId: string, clientId?: string | null): Promise<string | null> {
+  if (clientId) {
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
+      select: { userId: true },
+    });
+    if (!client || client.userId !== userId) {
+      return "You do not own this client";
+    }
+  }
+  return null;
+}
+
 export async function GET() {
   const user = await getDbUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -57,6 +70,11 @@ export async function POST(request: NextRequest) {
   const parsed = projectSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
 
+  const ownershipError = await validateProjectOwnership(user.id, parsed.data.clientId);
+  if (ownershipError) {
+    return NextResponse.json({ error: ownershipError }, { status: 400 });
+  }
+
   const { startDate, endDate, ...rest } = parsed.data;
   const project = await prisma.project.create({
     data: {
@@ -85,6 +103,11 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+
+  const ownershipError = await validateProjectOwnership(user.id, parsed.data.clientId);
+  if (ownershipError) {
+    return NextResponse.json({ error: ownershipError }, { status: 400 });
+  }
 
   const { id, startDate, endDate, ...updates } = parsed.data;
 

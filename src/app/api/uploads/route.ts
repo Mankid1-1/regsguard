@@ -19,6 +19,19 @@ const ALLOWED_EXTENSIONS = [".pdf", ".png", ".jpg", ".jpeg", ".heic"];
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+async function validateUploadOwnership(userId: string, documentId?: string | null): Promise<string | null> {
+  if (documentId) {
+    const doc = await prisma.document.findUnique({
+      where: { id: documentId },
+      select: { userId: true },
+    });
+    if (!doc || doc.userId !== userId) {
+      return "You do not own this document";
+    }
+  }
+  return null;
+}
+
 export async function GET(request: NextRequest) {
   const user = await getDbUser();
   if (!user) {
@@ -87,6 +100,15 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Optional documentId linkage
+  const documentId = formData.get("documentId") as string | null;
+
+  // Validate document ownership
+  const ownershipError = await validateUploadOwnership(user.id, documentId);
+  if (ownershipError) {
+    return NextResponse.json({ error: ownershipError }, { status: 400 });
+  }
+
   // Build the upload path: uploads/{userId}/{timestamp}-{filename}
   const timestamp = Date.now();
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -107,9 +129,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-
-  // Optional documentId linkage
-  const documentId = formData.get("documentId") as string | null;
 
   // Create the database record
   const upload = await prisma.fileUpload.create({

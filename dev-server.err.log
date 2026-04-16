@@ -1,0 +1,11 @@
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Brend\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * C:\Users\Brend\Desktop\QuickWins\Regsguard\package-lock.json
+
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (197kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+[2026-04-16T07:15:33.933Z] [PID: 5556] [32m[NODE-CRON][32m [33m[WARN][0m missed execution at Thu Apr 16 2026 02:15:30 GMT-0500 (Central Daylight Time)! Possible blocking IO or high CPU user at the same process used by node-cron.
+[2026-04-16T07:18:03.610Z] [PID: 5556] [32m[NODE-CRON][32m [33m[WARN][0m missed execution at Thu Apr 16 2026 02:18:00 GMT-0500 (Central Daylight Time)! Possible blocking IO or high CPU user at the same process used by node-cron.
+[2026-04-16T07:18:34.326Z] [PID: 5556] [32m[NODE-CRON][32m [33m[WARN][0m missed execution at Thu Apr 16 2026 02:18:30 GMT-0500 (Central Daylight Time)! Possible blocking IO or high CPU user at the same process used by node-cron.

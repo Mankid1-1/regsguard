@@ -79,6 +79,11 @@ enum SubscriptionStatus {
   TRIALING
 }
 
+enum PricingTier {
+  STANDARD       // $29/mo
+  EARLY_BIRD     // $19/mo (first 100 only)
+}
+
 enum ProjectStatus {
   DRAFT
   ACTIVE
@@ -167,8 +172,6 @@ enum ProgramStatus {
   SUSPENDED
 }
 
-// ─── (NextAuth models removed — auth handled by Clerk) ───
-
 // ─── Multi-Tenancy ───
 
 model Tenant {
@@ -200,7 +203,6 @@ model User {
   role               Role      @default(USER)
   onboardingComplete Boolean   @default(false)
   tenantId           String?
-  referralCode       String?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -231,6 +233,15 @@ model User {
   webhooks        Webhook[]
   jobPhotos       JobPhoto[]
   followUps       ScheduledFollowUp[]
+  complianceStreak ComplianceStreak?
+  badges          UserBadge[]
+  activityFeed    ActivityFeed[]
+  testimonial     UserTestimonial?
+  certificates    ComplianceCertificate[]
+  referralLinks   ReferralLink[]
+  referralsGiven  UserReferral[]      @relation("Referrer")
+  referralsUsed   UserReferral[]      @relation("Referred")
+  autoRenewalConfigs AutoRenewalConfig[]
 
   @@index([tenantId])
 }
@@ -374,6 +385,7 @@ model Regulation {
   userDeadlines   UserDeadline[]
   complianceLogs  ComplianceLog[]
   ceCredits       CECredit[]
+  autoRenewalConfigs AutoRenewalConfig[]
 
   @@unique([trade, state, title], name: "trade_state_title")
 }
@@ -444,8 +456,11 @@ model Subscription {
   stripeSubscriptionId String?            @unique
   stripePriceId        String?
   status               SubscriptionStatus @default(TRIALING)
+  pricingTier          PricingTier        @default(STANDARD)
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
+  earlyBirdLocked      Boolean            @default(false)
+  referralMonthsEarned Int                @default(0)
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
 
@@ -471,22 +486,28 @@ model PartnerProgram {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  tenant    Tenant?    @relation(fields: [tenantId], references: [id])
-  referrals Referral[]
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
 }
 
-model Referral {
-  id            String   @id @default(cuid())
-  programId     String
-  referredEmail String
-  referredUserId String?
-  status        String   @default("PENDING")
-  commission    Float    @default(0)
-  createdAt     DateTime @default(now())
+// ─── User Referral System (Refer 3 → 1 month free) ───
 
-  program PartnerProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+model UserReferral {
+  id               String    @id @default(cuid())
+  referrerUserId   String
+  referredUserId   String?
+  referredEmail    String
+  code             String
+  status           String    @default("PENDING")
+  freeMonthsEarned Int       @default(0)
+  conversionDate   DateTime?
+  createdAt        DateTime  @default(now())
 
-  @@index([programId])
+  referrer User? @relation("Referrer", fields: [referrerUserId], references: [id], onDelete: Cascade)
+  referred User? @relation("Referred", fields: [referredUserId], references: [id], onDelete: SetNull)
+
+  @@index([referrerUserId])
+  @@index([code])
+  @@index([status])
   @@index([referredEmail])
 }
 
@@ -774,4 +795,168 @@ model ScheduledFollowUp {
   @@index([userId])
   @@index([scheduledAt])
   @@index([scheduledAt, sentAt])
+}
+
+// ─── Compliance Tracking (Gamification & Social) ───
+
+model ComplianceStreak {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  days      Int      @default(0)
+  lastCheck DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badge     String
+  earnedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badge])
+  @@index([userId])
+}
+
+model ActivityFeed {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String
+  title       String
+  description String?  @db.Text
+  trade       String?
+  state       String?
+  public      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([public, createdAt])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model UserTestimonial {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  quote     String   @db.Text
+  role      String
+  location  String
+  avatarUrl String?
+  approved  Boolean  @default(false)
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([approved])
+  @@index([featured])
+}
+
+model ComplianceCertificate {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique @default(cuid())
+  title        String
+  score        Int
+  shareUrl     String?
+  shareCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model ReferralLink {
+  id           String    @id @default(cuid())
+  userId       String
+  code         String    @unique
+  referrals    Int       @default(0)
+  conversions  Int       @default(0)
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+}
+
+// ─── Free Compliance Audit ───
+
+model ComplianceAudit {
+  id               String   @id @default(cuid())
+  email            String
+  state            String   @db.VarChar(2)
+  trade            String
+  licenseNumber    String
+  insuranceStatus  String?
+  bondStatus       String?
+  auditScore       Int?
+  missingItems     Json?
+  createdAt        DateTime @default(now())
+
+  @@index([email])
+  @@index([state])
+}
+
+// Error Logging
+
+model ErrorLog {
+  id           String   @id @default(cuid())
+  code         String   @db.VarChar(50)
+  message      String   @db.Text
+  userMessage  String   @db.Text
+  details      Json?
+  statusCode   Int
+  retryable    Boolean  @default(false)
+  userId       String?
+  requestId    String?
+  ip           String?
+  userAgent    String?
+  path         String?
+  stackTrace   String?  @db.Text
+  timestamp    DateTime @default(now())
+
+  @@index([code])
+  @@index([userId])
+  @@index([timestamp])
+  @@index([statusCode])
+  @@index([requestId])
+}
+
+// Auto-Renewal Configuration
+
+model AutoRenewalConfig {
+  id              String   @id @default(cuid())
+  userId          String
+  regulationId    String
+  paymentMethodId String?
+  enabled         Boolean  @default(true)
+  autoPay         Boolean  @default(false)
+  renewalFee      Float?
+  digitalSignature Json?   @default("{}")
+  lastRenewedAt   DateTime?
+  nextRenewalAt   DateTime
+  failureCount    Int      @default(0)
+  maxRetries      Int      @default(3)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regulation Regulation @relation(fields: [regulationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, regulationId])
+  @@index([userId])
+  @@index([regulationId])
+  @@index([nextRenewalAt])
+  @@index([enabled, nextRenewalAt])
 }
