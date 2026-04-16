@@ -35,6 +35,17 @@ export default clerkMiddleware(async (auth, req) => {
   // Apply basic security headers to all responses
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   
+  // Content Security Policy to allow external scripts and connections
+  const csp = [
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com https://vercel.live",
+    "connect-src 'self' https://api.stripe.com https://*.clerk.accounts.dev https://*.clerk.com https://clerk-telemetry.com",
+    "img-src 'self' data: https: blob:",
+    "font-src 'self' data:",
+    "style-src 'self' 'unsafe-inline'",
+    "default-src 'self'"
+  ].join('; ');
+  
+  response.headers.set('Content-Security-Policy', csp);
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-XSS-Protection', '1; mode=block');
