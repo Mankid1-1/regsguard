@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { LocaleProvider } from "@/components/providers/locale-provider";
 import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { AnalyticsProvider } from "@/components/providers/analytics-provider";
+import { Toaster } from "@/components/ui/toaster";
 import { getTenantFromHeaders } from "@/lib/tenant.server";
 import "./globals.css";
 
@@ -68,6 +69,7 @@ export default async function RootLayout({
           </ThemeProvider>
           <ServiceWorkerRegister />
           <AnalyticsProvider />
+          <Toaster />
         </ClerkProvider>
       </body>
     </html>
