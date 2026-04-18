@@ -23,6 +23,9 @@ const isPublicRoute = createRouteMatcher([
   "/api/license-verification/(.*)",
   "/api/badge/(.*)",
   "/api/files/(.*)",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/manifest.webmanifest",
   "/stripe-checkout-mockup.html",
 ]);
 
