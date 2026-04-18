@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { LocaleProvider } from "@/components/providers/locale-provider";
 import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { AnalyticsProvider } from "@/components/providers/analytics-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { ToastProvider } from "@/components/ui/toast";
 import { getTenantFromHeaders } from "@/lib/tenant.server";
 import "./globals.css";
 
@@ -62,14 +62,15 @@ export default async function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClerkProvider>
-          <ThemeProvider>
-            <LocaleProvider>
-              <TenantProvider config={tenant}>{children}</TenantProvider>
-            </LocaleProvider>
-          </ThemeProvider>
-          <ServiceWorkerRegister />
-          <AnalyticsProvider />
-          <Toaster />
+          <ToastProvider>
+            <ThemeProvider>
+              <LocaleProvider>
+                <TenantProvider config={tenant}>{children}</TenantProvider>
+              </LocaleProvider>
+            </ThemeProvider>
+            <ServiceWorkerRegister />
+            <AnalyticsProvider />
+          </ToastProvider>
         </ClerkProvider>
       </body>
     </html>
