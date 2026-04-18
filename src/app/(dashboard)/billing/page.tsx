@@ -59,7 +59,13 @@ export default async function BillingPage() {
           status={subscription.status}
           currentPeriodEnd={subscription.currentPeriodEnd?.toISOString() ?? null}
           cancelAtPeriodEnd={subscription.cancelAtPeriodEnd}
-          plan={subscription.stripePriceId === process.env.STRIPE_PRICE_ANNUAL ? "Annual" : "Monthly"}
+          plan={
+            subscription.stripePriceId === process.env.STRIPE_PRICE_ANNUAL
+              ? "Annual"
+              : subscription.stripePriceId === process.env.STRIPE_PRICE_SOLO
+                ? "Solo"
+                : "Monthly"
+          }
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-3">

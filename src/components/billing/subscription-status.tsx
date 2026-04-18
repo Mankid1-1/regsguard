@@ -18,8 +18,14 @@ export function SubscriptionStatus({ status, currentPeriodEnd, cancelAtPeriodEnd
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch {
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      alert(data.error || "Could not open billing portal");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to open billing portal");
+    } finally {
       setLoading(false);
     }
   }
