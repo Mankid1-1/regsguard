@@ -2,6 +2,7 @@
 
 import { UserButton } from "@clerk/nextjs";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import { CommandPalette } from "@/components/command-palette";
 
 interface TopbarProps {
   onMenuToggle: () => void;
@@ -31,7 +32,9 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
         </svg>
       </button>
 
-      <div className="flex-1" />
+      <div className="flex-1">
+        <CommandPalette />
+      </div>
 
       <div className="flex items-center gap-3">
         <NotificationBell />

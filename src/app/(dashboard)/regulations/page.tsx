@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RegulationActions } from "@/components/regulations/regulation-actions";
+import { FileNowButton } from "@/components/regulations/file-now-button";
+import { LiveCountdown } from "@/components/live-countdown";
 
 function getStatusBadge(status: string | null) {
   switch (status) {
@@ -195,28 +197,15 @@ export default async function RegulationsPage() {
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
-                        <span
-                          className={
-                            daysUntilDue !== null && daysUntilDue <= 7
-                              ? "text-danger font-medium"
-                              : daysUntilDue !== null && daysUntilDue <= 30
-                                ? "text-warning font-medium"
-                                : "text-muted-foreground"
-                          }
-                        >
+                        <span className="text-muted-foreground">
                           {deadline.nextDueDate.toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
                           })}
-                          {daysUntilDue !== null && (
-                            <span className="ml-1">
-                              ({daysUntilDue <= 0
-                                ? "Overdue"
-                                : `${daysUntilDue}d left`})
-                            </span>
-                          )}
                         </span>
+                        <span className="text-xs">&middot;</span>
+                        <LiveCountdown targetDate={deadline.nextDueDate} />
                       </div>
                     )}
 
@@ -254,7 +243,16 @@ export default async function RegulationsPage() {
                     )}
                   </div>
 
-                  <div className="border-t border-border pt-3">
+                  <div className="border-t border-border pt-3 space-y-2">
+                    {/* One-click file now - primary action */}
+                    {(reg.officialEmail || reg.portalUrl) && (
+                      <FileNowButton
+                        regulationId={reg.id}
+                        regulationTitle={reg.title}
+                        officialEmail={reg.officialEmail}
+                        portalUrl={reg.portalUrl}
+                      />
+                    )}
                     <RegulationActions
                       regulationId={reg.id}
                       regulationTitle={reg.title}

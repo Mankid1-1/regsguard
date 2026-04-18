@@ -8,6 +8,7 @@ import { CalendarView } from "@/components/dashboard/calendar-view";
 import { FilingHistory } from "@/components/dashboard/filing-history";
 import { FilingPipeline } from "@/components/dashboard/filing-pipeline";
 import { SetupChecklist } from "@/components/dashboard/setup-checklist";
+import { NextBestAction } from "@/components/dashboard/next-best-action";
 import { ComplianceScore } from "@/components/dashboard/compliance-score";
 import { ExportButton } from "@/components/export/export-button";
 import { AutoRenewalStatus } from "@/components/dashboard/auto-renewal-status";
@@ -121,6 +122,24 @@ export default async function DashboardPage() {
           hasProfile={!!profile}
           regulationCount={regulationCount}
           deadlineCount={deadlines.length}
+          documentCount={documentCount}
+        />
+
+        {/* Adaptive "next best action" recommendation */}
+        <NextBestAction
+          deadlines={deadlinesWithStatus.map((d: any) => ({
+            id: d.id,
+            status: d.status,
+            nextDueDate: d.nextDueDate,
+            regulation: {
+              id: d.regulation.id,
+              title: d.regulation.title,
+              authority: d.regulation.authority,
+              officialEmail: d.regulation.officialEmail ?? null,
+            },
+          }))}
+          hasProfile={!!profile}
+          regulationCount={regulationCount}
           documentCount={documentCount}
         />
 
