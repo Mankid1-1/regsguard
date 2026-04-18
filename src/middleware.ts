@@ -42,6 +42,8 @@ export default clerkMiddleware(async (auth, req) => {
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
+    "worker-src 'self' blob:",
+    "frame-src 'self' https://js.stripe.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
     "default-src 'self'"
   ].join('; ');
   
