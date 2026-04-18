@@ -1,4 +1,4 @@
-const CACHE_NAME = "regsguard-v1";
+const CACHE_NAME = "regsguard-v3";
 const OFFLINE_URL = "/offline";
 
 // Assets to cache on install (app shell)
@@ -42,6 +42,12 @@ self.addEventListener("fetch", (event) => {
 
   // Skip chrome-extension, etc.
   if (!url.protocol.startsWith("http")) return;
+
+  // Only handle requests to our own origin. Third-party scripts
+  // (Clerk, Stripe, Cloudflare Insights, etc.) must bypass the SW so
+  // the page's CSP and CORS rules apply directly to their network
+  // requests rather than going through our fetch handler.
+  if (url.origin !== self.location.origin) return;
 
   // API requests: network only (don't cache sensitive data)
   if (url.pathname.startsWith("/api/")) return;
