@@ -72,6 +72,10 @@ export function CommandPalette() {
     { id: "action-add-reg", group: "Actions", label: "Track More Regulations", description: "Expand compliance coverage", icon: <IconSparkles />, keywords: ["onboarding", "add"], action: () => navigate("/onboarding") },
     { id: "action-profile", group: "Actions", label: "Update Business Profile", description: "Used for auto-fill", icon: <IconUser />, action: () => navigate("/profile") },
     { id: "action-export", group: "Actions", label: "Export Compliance Report", description: "Download audit PDF", icon: <IconDownload />, action: () => navigate("/dashboard") },
+    // Quick support actions
+    { id: "quick-support", group: "Quick", label: "Contact Support", description: "brendan@rebooked.org  (612) 439-7445", icon: <IconHelp />, keywords: ["help", "contact", "phone", "email"], action: () => navigate("/support") },
+    { id: "quick-call", group: "Quick", label: "Call Support Now", description: "(612) 439-7445", icon: <IconPhone />, keywords: ["phone", "call", "help"], action: () => { window.location.href = "tel:+16124397445"; setOpen(false); } },
+    { id: "quick-email", group: "Quick", label: "Email Support", description: "brendan@rebooked.org", icon: <IconMail />, keywords: ["email", "help"], action: () => { window.location.href = "mailto:brendan@rebooked.org"; setOpen(false); } },
   ];
 
   // Fuzzy filter
@@ -232,3 +236,6 @@ const IconPlus = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" 
 const IconSparkles = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>;
 const IconUser = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
 const IconDownload = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
+const IconHelp = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093M12 17h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const IconPhone = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h2.5a1 1 0 01.97.757l1 4a1 1 0 01-.29.99L7.7 10.2a12 12 0 006.1 6.1l1.45-1.48a1 1 0 01.99-.29l4 1a1 1 0 01.76.97V19a2 2 0 01-2 2h-1C9.82 21 3 14.18 3 6V5z" /></svg>;
+const IconMail = () => <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;

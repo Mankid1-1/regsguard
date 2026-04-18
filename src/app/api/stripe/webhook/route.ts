@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
+import { dispatchNotification } from "@/lib/notifications/dispatcher";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -106,6 +107,36 @@ export async function POST(request: NextRequest) {
           where: { stripeSubscriptionId: sub.id },
           data: { status: "CANCELED" },
         });
+        break;
+      }
+
+      // Fires 3 days before a trial ends. Nudge the user to confirm their card
+      // or cancel if they've decided not to continue.
+      case "customer.subscription.trial_will_end": {
+        const sub = event.data.object;
+        const subData = sub as unknown as { trial_end: number | null };
+        const trialEnd = subData.trial_end
+          ? new Date(subData.trial_end * 1000)
+          : null;
+
+        const record = await prisma.subscription.findFirst({
+          where: { stripeSubscriptionId: sub.id },
+          select: { userId: true },
+        });
+
+        if (record && trialEnd) {
+          const daysLeft = Math.max(
+            0,
+            Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+          );
+          await dispatchNotification(
+            record.userId,
+            "SYSTEM",
+            `Your free trial ends in ${daysLeft} days`,
+            `Your RegsGuard trial converts to a paid subscription on ${trialEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}. We'll bill the card on file unless you cancel first. Questions? brendan@rebooked.org or (612) 439-7445.`,
+            { stripeSubscriptionId: sub.id, trialEnd: trialEnd.toISOString() },
+          );
+        }
         break;
       }
     }
