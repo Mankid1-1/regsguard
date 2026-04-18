@@ -41,7 +41,8 @@
       "Bash(where python *)",
       "Bash(python -m venv venv)",
       "Bash(/c/Python314/python.exe -m venv venv)",
-      "Bash(cmd //c \"cd /d C:\\\\Users\\\\Brend\\\\Desktop\\\\QuickWins\\\\Bjorn-Laptop && python -m venv venv && echo DONE\")"
+      "Bash(cmd //c \"cd /d C:\\\\Users\\\\Brend\\\\Desktop\\\\QuickWins\\\\Bjorn-Laptop && python -m venv venv && echo DONE\")",
+      "Bash(venv/Scripts/python.exe -m pip install --upgrade pip wheel setuptools)"
     ]
   }
 }

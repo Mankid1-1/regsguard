@@ -8,6 +8,9 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/partners",
   "/offline",
+  "/terms",
+  "/privacy",
+  "/verified/(.*)",
   "/compliance/(.*)",
   "/api/webhooks/(.*)",
   "/api/health",
@@ -18,6 +21,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/compliance/share/(.*)",
   "/api/calendar/ical/(.*)",
   "/api/license-verification/(.*)",
+  "/api/badge/(.*)",
+  "/api/files/(.*)",
   "/stripe-checkout-mockup.html",
 ]);
 
