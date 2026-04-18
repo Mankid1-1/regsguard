@@ -42,13 +42,13 @@ export default clerkMiddleware(async (auth, req) => {
   
   // Content Security Policy to allow external scripts and connections
   const csp = [
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com https://vercel.live",
-    "connect-src 'self' https://api.stripe.com https://*.clerk.accounts.dev https://*.clerk.com https://clerk-telemetry.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com https://vercel.live https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+    "connect-src 'self' https://api.stripe.com https://*.clerk.accounts.dev https://*.clerk.com https://clerk-telemetry.com https://cloudflareinsights.com https://*.ingest.sentry.io",
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
     "worker-src 'self' blob:",
-    "frame-src 'self' https://js.stripe.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.clerk.accounts.dev https://challenges.cloudflare.com",
     "default-src 'self'"
   ].join('; ');
   
