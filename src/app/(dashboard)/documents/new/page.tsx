@@ -53,36 +53,61 @@ export default function NewDocumentPage() {
       });
   }, []);
 
+  const [autoFilledCount, setAutoFilledCount] = useState(0);
+
   function selectTemplate(t: TemplateInfo) {
     setSelected(t);
     setTitle(t.name);
     setFormData({});
-    // Auto-fill immediately from profile
-    const params = new URLSearchParams({ templateSlug: t.slug });
-    fetch(`/api/documents/autofill?${params.toString()}`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((filled) => { if (filled) setFormData(filled); })
-      .catch(() => {});
+    setAutoFilledCount(0);
+    // Kick off initial auto-fill with whatever (client/project) is already set
+    runAutoFill(t, clientId, projectId, { silent: true, reset: true });
   }
 
   function setField(key: string, value: string) {
     setFormData((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function handleAutoFill() {
+  async function runAutoFill(
+    template: TemplateInfo | null,
+    cId: string,
+    pId: string,
+    opts: { silent?: boolean; reset?: boolean } = {},
+  ) {
+    if (!template) return;
     try {
-      const params = new URLSearchParams({ templateSlug: selected!.slug });
-      if (clientId) params.set("clientId", clientId);
-      if (projectId) params.set("projectId", projectId);
+      const params = new URLSearchParams({ templateSlug: template.slug });
+      if (cId) params.set("clientId", cId);
+      if (pId) params.set("projectId", pId);
       const res = await fetch(`/api/documents/autofill?${params.toString()}`);
-      if (res.ok) {
-        const filled = await res.json();
-        setFormData((prev) => ({ ...prev, ...filled }));
-        toast("Fields auto-filled from your profile.", "success");
+      if (!res.ok) return;
+      const filled: Record<string, string> = await res.json();
+      const count = Object.keys(filled).length;
+      setAutoFilledCount(count);
+      // When resetting (new template selected) replace formData entirely.
+      // Otherwise merge -- preserves manually-entered values while filling
+      // in the new values from project/client.
+      setFormData((prev) => (opts.reset ? filled : { ...prev, ...filled }));
+      if (!opts.silent) {
+        toast(`${count} field${count === 1 ? "" : "s"} auto-filled.`, "success");
       }
     } catch {
-      toast("Auto-fill failed.", "error");
+      if (!opts.silent) toast("Auto-fill failed.", "error");
     }
+  }
+
+  // Re-run auto-fill whenever the selected client or project changes.
+  // This is the "link a job" UX: pick template -> pick project -> fields
+  // fill in automatically with no extra clicks.
+  useEffect(() => {
+    if (selected) {
+      runAutoFill(selected, clientId, projectId, { silent: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientId, projectId]);
+
+  async function handleAutoFill() {
+    await runAutoFill(selected, clientId, projectId);
   }
 
   async function handleCreate() {
@@ -168,26 +193,51 @@ export default function NewDocumentPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Document Details</CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">
+            Link a job to auto-fill most fields. Your business profile always fills first.
+          </p>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input label="Document Title" value={title} onChange={(e) => setTitle(e.target.value)} />
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium">Client</label>
+              <label className="mb-1 block text-sm font-medium">
+                Client {clientId && <span className="text-green-600 text-xs">✓</span>}
+              </label>
               <select className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" value={clientId} onChange={(e) => setClientId(e.target.value)}>
                 <option value="">None</option>
                 {clients.map((c) => <option key={c.id} value={c.id}>{c.companyName || c.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Project</label>
+              <label className="mb-1 block text-sm font-medium">
+                Project / Job {projectId && <span className="text-green-600 text-xs">✓</span>}
+              </label>
               <select className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" value={projectId} onChange={(e) => setProjectId(e.target.value)}>
                 <option value="">None</option>
                 {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={handleAutoFill}>Auto-Fill from Profile</Button>
+
+          <div className="flex items-center justify-between rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
+            <div className="flex items-center gap-2 text-xs">
+              <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              {autoFilledCount > 0 ? (
+                <span>
+                  <strong className="text-primary">{autoFilledCount}</strong> of <strong>{selected.fields.length}</strong> fields auto-filled
+                  {!projectId && " — link a job for more"}
+                </span>
+              ) : (
+                <span className="text-muted-foreground">Select a client/project to auto-fill more fields</span>
+              )}
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleAutoFill}>
+              Refresh
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

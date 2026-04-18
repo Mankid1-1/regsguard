@@ -12,6 +12,8 @@ export const proposalTemplate: DocumentTemplate = {
     { key: "proposalNumber", label: "Proposal Number", type: "text", required: true, placeholder: "PROP-001", section: "Proposal Details" },
     { key: "proposalDate", label: "Proposal Date", type: "date", required: true, section: "Proposal Details" },
     { key: "validUntil", label: "Valid Until", type: "date", required: true, section: "Proposal Details" },
+    { key: "projectName", label: "Project / Job Name", type: "text", required: false, autoFillFrom: "project.name", section: "Proposal Details" },
+    { key: "projectAddress", label: "Project Address", type: "text", required: false, autoFillFrom: "project.address", section: "Proposal Details" },
     // From
     { key: "fromName", label: "From Name", type: "text", required: true, autoFillFrom: "profile.businessName", section: "From" },
     { key: "fromAddress", label: "Address", type: "text", required: true, autoFillFrom: "profile.address", section: "From" },

@@ -16,6 +16,10 @@ export const workOrderTemplate: DocumentTemplate = {
     { key: "customerName", label: "Customer Name", type: "text", required: true, autoFillFrom: "client.name", section: "Customer" },
     { key: "customerPhone", label: "Phone", type: "text", required: false, autoFillFrom: "client.phone", section: "Customer" },
     { key: "customerAddress", label: "Address", type: "text", required: true, autoFillFrom: "client.address", section: "Customer" },
+    // Project / Job
+    { key: "projectName", label: "Project / Job", type: "text", required: false, autoFillFrom: "project.name", section: "Service Details" },
+    { key: "jobSiteAddress", label: "Job Site Address (if different)", type: "text", required: false, autoFillFrom: "project.address", section: "Service Details" },
+    { key: "permitNumber", label: "Permit Number (if applicable)", type: "text", required: false, autoFillFrom: "project.permitNumber", section: "Service Details" },
     // Service Details
     { key: "serviceDate", label: "Service Date", type: "date", required: true, section: "Service Details" },
     { key: "serviceType", label: "Service Type", type: "select", required: true, options: [

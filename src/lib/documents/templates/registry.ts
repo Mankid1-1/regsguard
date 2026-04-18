@@ -118,9 +118,13 @@ import { i9Template } from "./i9";
 import { osha300Template, osha300aTemplate } from "./osha-300";
 import { dailyLogTemplate } from "./daily-log";
 import { aiaG702Template } from "./aia-g702";
+import { aiaG703Template } from "./aia-g703";
 import { aiaG704Template } from "./aia-g704";
 import { jhaTemplate } from "./jha";
 import { rfiTemplate } from "./rfi";
+import { acord25Template } from "./acord-25";
+import { toolboxTalkTemplate } from "./toolbox-talk";
+import { incidentReportTemplate } from "./incident-report";
 
 export const TEMPLATE_REGISTRY: DocumentTemplate[] = [
   w9Template,
@@ -144,9 +148,13 @@ export const TEMPLATE_REGISTRY: DocumentTemplate[] = [
   osha300aTemplate,
   dailyLogTemplate,
   aiaG702Template,
+  aiaG703Template,
   aiaG704Template,
   jhaTemplate,
   rfiTemplate,
+  acord25Template,
+  toolboxTalkTemplate,
+  incidentReportTemplate,
 ];
 
 export function getTemplate(slug: string): DocumentTemplate | undefined {
