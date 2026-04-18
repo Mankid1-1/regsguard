@@ -345,6 +345,228 @@ async function main() {
         "CE hours vary by license type. Must be completed before biennial renewal deadline. Approved providers listed on DSPS website. Online and in-person courses available.",
       active: true,
     },
+
+    // ─── Trade-Specific Endorsements (HVAC/Sheet Metal) ───
+    {
+      trade: "HVAC" as const, state: "MN", title: "MN Sheet Metal Worker License",
+      description: "Annual renewal of MN sheet metal worker license. Required for individuals fabricating, installing, or maintaining ductwork and sheet-metal building systems. Separate from general HVAC license.",
+      authority: "MN DLI", officialEmail: "dli.license@state.mn.us",
+      portalUrl: "https://www.dli.mn.gov/business/get-licenses-and-permits", fee: "$50",
+      renewalCycle: "ANNUAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Renews on anniversary date. CE required. Online via DLI portal.", active: true,
+    },
+    {
+      trade: "HVAC" as const, state: "WI", title: "WI Sheet Metal Worker Credential",
+      description: "Wisconsin sheet metal worker credential renewal through DSPS. Required for ductwork fabrication and installation.",
+      authority: "WI DSPS", officialEmail: null, portalUrl: "https://dsps.wi.gov",
+      fee: "$45", renewalCycle: "BIENNIAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: 6, defaultDueDay: 30, notes: "Renews June 30 biennially. CE required.", active: true,
+    },
+    {
+      trade: "HVAC" as const, state: "MN", title: "MN Boiler Operator License",
+      description: "Annual renewal of MN boiler/pressure-vessel operator license required for operating commercial-grade boilers and high-pressure piping systems.",
+      authority: "MN DLI", officialEmail: "dli.boiler@state.mn.us",
+      portalUrl: "https://www.dli.mn.gov/business/get-licenses-and-permits", fee: "$30",
+      renewalCycle: "ANNUAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Required for any boiler over 30 horsepower or 200 PSI. Different grades (1st-4th class).", active: true,
+    },
+
+    // ─── Septic / POWTS ───
+    {
+      trade: "PLUMBING" as const, state: "MN", title: "MN Septic Systems Installer (SSTS) License",
+      description: "MN Subsurface Sewage Treatment System installer license. Required for installing, repairing, or pumping on-site septic systems. Issued by MPCA.",
+      authority: "MN Pollution Control Agency", officialEmail: "ssts.staff.mpca@state.mn.us",
+      portalUrl: "https://www.pca.state.mn.us/business/subsurface-sewage-treatment-system-ssts-program",
+      fee: "$200", renewalCycle: "ANNUAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: 12, defaultDueDay: 31,
+      notes: "Year-end deadline. CE: 6 hours per renewal year required.", active: true,
+    },
+    {
+      trade: "PLUMBING" as const, state: "WI", title: "WI POWTS Installer Credential",
+      description: "Wisconsin Private Onsite Wastewater Treatment System installer credential.",
+      authority: "WI DSPS", officialEmail: null,
+      portalUrl: "https://dsps.wi.gov/Pages/Professions/POWTSInstaller/Default.aspx",
+      fee: "$50", renewalCycle: "BIENNIAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: 6, defaultDueDay: 30, notes: "Renews June 30 biennially.", active: true,
+    },
+
+    // ─── Backflow / Cross-Connection ───
+    {
+      trade: "PLUMBING" as const, state: "MN", title: "MN Backflow Prevention Assembly Tester",
+      description: "Certification required to test and certify backflow prevention assemblies in Minnesota. Renewed every 3 years through ABPA or ASSE certification.",
+      authority: "MN Dept of Health (delegated to ABPA/ASSE)", officialEmail: null,
+      portalUrl: "https://www.health.state.mn.us/communities/environment/water/backflow.html",
+      fee: "$150", renewalCycle: "TRIENNIAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Certification through ABPA, ASSE, or AWWA. Renewal exam + CE typically required.", active: true,
+    },
+    {
+      trade: "PLUMBING" as const, state: "WI", title: "WI Cross-Connection Control Tester",
+      description: "WI credential to perform cross-connection control assembly testing (backflow).",
+      authority: "WI DSPS", officialEmail: null,
+      portalUrl: "https://dsps.wi.gov/Pages/Professions/CrossConnectionControlTester/Default.aspx",
+      fee: "$100", renewalCycle: "BIENNIAL" as const, category: "LICENSE_RENEWAL" as const,
+      defaultDueMonth: 6, defaultDueDay: 30, notes: "Renews June 30 biennially.", active: true,
+    },
+
+    // ─── EPA RRP Individual ───
+    {
+      trade: "LEAD_SAFE" as const, state: "MN", title: "EPA Lead-Safe RRP Individual Renovator Cert",
+      description: "Individual renovator certification under EPA's Renovation, Repair and Painting (RRP) Rule. Required for anyone performing renovation in pre-1978 housing or child-occupied facilities. Separate from the firm certification.",
+      authority: "EPA", officialEmail: null,
+      portalUrl: "https://www.epa.gov/lead/lead-renovation-repair-and-painting-program",
+      fee: "$300", renewalCycle: "FIVE_YEAR" as const, category: "EPA_CERTIFICATION" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Initial 8-hour course; 4-hour refresher every 5 years. Required for ALL workers, not just firms.", active: true,
+    },
+
+    // ─── OSHA Safety Renewals ───
+    {
+      trade: "GENERAL" as const, state: "MN", title: "OSHA 30-Hour Construction Card (Renewal)",
+      description: "OSHA 30-hour construction safety training card. Many GCs require all workers on jobsites to hold a current card. Cards are recommended to be retaken every 5 years to maintain current best practices.",
+      authority: "OSHA (via authorized trainers)", officialEmail: null,
+      portalUrl: "https://www.osha.gov/training", fee: "$150-$250",
+      renewalCycle: "FIVE_YEAR" as const, category: "SAFETY_TRAINING" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "OSHA does not officially expire 30-hour cards but most GCs require retake every 5 years.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "WI", title: "OSHA 30-Hour Construction Card (Renewal)",
+      description: "OSHA 30-hour construction safety training card. Many GCs require all workers on jobsites to hold a current card.",
+      authority: "OSHA (via authorized trainers)", officialEmail: null,
+      portalUrl: "https://www.osha.gov/training", fee: "$150-$250",
+      renewalCycle: "FIVE_YEAR" as const, category: "SAFETY_TRAINING" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "OSHA does not officially expire 30-hour cards but most GCs require retake every 5 years.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "MN", title: "Aerial / Scissor Lift Certification",
+      description: "OSHA-required operator certification for aerial work platforms and scissor lifts. Per ANSI A92.24, operator must be re-evaluated every 3 years.",
+      authority: "OSHA / ANSI A92", officialEmail: null,
+      portalUrl: "https://www.osha.gov/aerial-lifts", fee: "$50-$200",
+      renewalCycle: "TRIENNIAL" as const, category: "SAFETY_TRAINING" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Re-eval every 3 years; immediate re-training after any incident.", active: true,
+    },
+
+    // ─── Federal Tax Filings ───
+    {
+      trade: "GENERAL" as const, state: "MN", title: "IRS Form 941 (Quarterly Federal Tax)",
+      description: "Employers must file IRS Form 941 quarterly to report income taxes, Social Security tax, and Medicare tax withheld from employee paychecks plus the employer portion. Due last day of month after the quarter ends.",
+      authority: "IRS", officialEmail: null,
+      portalUrl: "https://www.irs.gov/forms-pubs/about-form-941", fee: null,
+      renewalCycle: "VARIES" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Due Apr 30, Jul 31, Oct 31, Jan 31 each year. EFTPS required for deposits.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "MN", title: "IRS Form 940 (Annual FUTA Return)",
+      description: "Annual federal unemployment tax return. Due January 31 for the prior calendar year.",
+      authority: "IRS", officialEmail: null,
+      portalUrl: "https://www.irs.gov/forms-pubs/about-form-940", fee: null,
+      renewalCycle: "ANNUAL" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: 1, defaultDueDay: 31,
+      notes: "Filed alongside W-2 distribution. Quarterly deposits required if liability exceeds $500.", active: true,
+    },
+
+    // ─── State Tax Filings ───
+    {
+      trade: "GENERAL" as const, state: "MN", title: "MN Sales & Use Tax Return",
+      description: "Minnesota sales and use tax return filed monthly, quarterly, or annually depending on volume. Contractors typically file on materials purchased and certain installed services.",
+      authority: "MN Department of Revenue", officialEmail: null,
+      portalUrl: "https://www.revenue.state.mn.us/sales-and-use-tax", fee: null,
+      renewalCycle: "VARIES" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Filing frequency assigned by MN DOR based on prior-year sales tax volume.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "WI", title: "WI Sales & Use Tax Return",
+      description: "Wisconsin sales and use tax return. Filing frequency varies by tax volume.",
+      authority: "WI Department of Revenue", officialEmail: null,
+      portalUrl: "https://www.revenue.wi.gov/Pages/SalesAndUse/Home.aspx", fee: null,
+      renewalCycle: "VARIES" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Filing frequency assigned by WI DOR. My Tax Account portal for online filing.", active: true,
+    },
+
+    // ─── Workers Comp + Insurance ───
+    {
+      trade: "GENERAL" as const, state: "MN", title: "MN Workers' Compensation Insurance Annual Verification",
+      description: "Annual verification that workers' compensation insurance is current and meets MN coverage requirements. Required for any business with employees.",
+      authority: "MN Department of Labor and Industry", officialEmail: null,
+      portalUrl: "https://www.dli.mn.gov/business/workers-compensation", fee: null,
+      renewalCycle: "ANNUAL" as const, category: "INSURANCE" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Annual policy renewal. Lapses are reported to MN DLI and may trigger penalties.", active: true,
+    },
+    {
+      trade: "HVAC" as const, state: "MN", title: "Pollution / Refrigerant Liability Insurance",
+      description: "Pollution liability insurance recommended (and often required by GCs) for HVAC contractors handling refrigerants and chemical products.",
+      authority: "Insurance Carrier", officialEmail: null,
+      portalUrl: "https://www.epa.gov/section608/refrigerant-recycling-handling-and-disposal",
+      fee: null, renewalCycle: "ANNUAL" as const, category: "INSURANCE" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Common limits: $1M/occurrence, $2M aggregate. Often a GC prequalification requirement.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "MN", title: "Commercial Auto Liability Insurance",
+      description: "Commercial auto policy required for any vehicle used in the contracting business. Most GCs require $1M/occurrence minimum.",
+      authority: "Insurance Carrier", officialEmail: null,
+      portalUrl: "https://www.iii.org/article/business-vehicle-insurance",
+      fee: null, renewalCycle: "ANNUAL" as const, category: "INSURANCE" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Required by GCs and ISN/Avetta portals. Symbol-1 (any auto) preferred.", active: true,
+    },
+
+    // ─── City-Level Contractor Registration ───
+    {
+      trade: "GENERAL" as const, state: "MN", title: "Minneapolis Contractor License",
+      description: "City of Minneapolis Construction Code Services contractor license. Required to perform construction work in Minneapolis. Separate from state DLI license.",
+      authority: "City of Minneapolis CCS", officialEmail: "ccs.licensing@minneapolismn.gov",
+      portalUrl: "https://www2.minneapolismn.gov/business-services/construction-development/construction-contractor-licensing/",
+      fee: "$165", renewalCycle: "ANNUAL" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: 12, defaultDueDay: 31,
+      notes: "Calendar year — expires Dec 31. State license + insurance proof required.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "MN", title: "St. Paul Contractor License",
+      description: "City of St. Paul Department of Safety and Inspections contractor license.",
+      authority: "City of St. Paul DSI", officialEmail: "dsi.contractors@ci.stpaul.mn.us",
+      portalUrl: "https://www.stpaul.gov/departments/safety-inspections/contractor-licensing",
+      fee: "$155", renewalCycle: "ANNUAL" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: 12, defaultDueDay: 31,
+      notes: "Calendar year. State license, $25K bond, GL insurance proof required.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "WI", title: "Madison Contractor License",
+      description: "City of Madison contractor license issued by Building Inspection.",
+      authority: "City of Madison Building Inspection", officialEmail: null,
+      portalUrl: "https://www.cityofmadison.com/dpced/bi/contractor-licensing/",
+      fee: "$60", renewalCycle: "ANNUAL" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: 6, defaultDueDay: 30, notes: "Mid-year renewal cycle.", active: true,
+    },
+    {
+      trade: "GENERAL" as const, state: "WI", title: "Milwaukee Contractor Registration",
+      description: "City of Milwaukee Department of Neighborhood Services contractor registration.",
+      authority: "City of Milwaukee DNS", officialEmail: null,
+      portalUrl: "https://city.milwaukee.gov/dns/permits/Contractor-Registration",
+      fee: "$80", renewalCycle: "ANNUAL" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "State credential + bond + insurance required.", active: true,
+    },
+
+    // ─── DOT (commercial vehicles) ───
+    {
+      trade: "GENERAL" as const, state: "MN", title: "DOT Number / Biennial Update (MCS-150)",
+      description: "Federal DOT number registration. Required for any commercial motor vehicle over 10,001 lbs operating in interstate commerce. MCS-150 update required every 2 years.",
+      authority: "FMCSA / USDOT", officialEmail: null,
+      portalUrl: "https://www.fmcsa.dot.gov/registration", fee: null,
+      renewalCycle: "BIENNIAL" as const, category: "REGISTRATION" as const,
+      defaultDueMonth: null, defaultDueDay: null,
+      notes: "Update assigned by last digit of USDOT number. Failure to update results in deactivation.", active: true,
+    },
   ];
 
   for (const reg of regulations) {

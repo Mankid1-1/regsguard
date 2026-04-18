@@ -14,13 +14,23 @@ export default async function BillingPage() {
     where: { userId: user.id },
   });
 
+  const soloFeatures = [
+    "Up to 10 active deadlines",
+    "One-click PDF generation",
+    "Email alerts",
+    "1 user (no team)",
+    "Public Verified Compliant badge",
+  ];
+
   const features = [
     "Unlimited deadline tracking",
     "One-click PDF generation",
     "Auto-send to authorities",
     "Email & SMS alerts",
     "Full compliance audit log",
-    "Admin regulation management",
+    "Team accounts (Office Manager, Field Worker)",
+    "Vendor portal pre-fill (ISN/Avetta/Veriforce)",
+    "Public Verified Compliant badge",
   ];
 
   // Check if in free trial period (14 days from signup)
@@ -52,7 +62,15 @@ export default async function BillingPage() {
           plan={subscription.stripePriceId === process.env.STRIPE_PRICE_ANNUAL ? "Annual" : "Monthly"}
         />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
+          <PricingCard
+            title="Solo"
+            price="$19"
+            period="mo"
+            priceId={process.env.STRIPE_PRICE_SOLO || ""}
+            features={soloFeatures}
+            badge="One-truck contractor"
+          />
           <PricingCard
             title="Monthly"
             price="$29"
