@@ -16,6 +16,14 @@ enum Role {
   MANAGER
   FIELD_WORKER
   BOOKKEEPER
+  OFFICE_MANAGER
+}
+
+enum ExtractionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }
 
 enum Trade {
@@ -66,9 +74,13 @@ enum ComplianceAction {
   DOCUMENT_SENT
   DOCUMENT_SIGNED
   AUTO_FILED
+  AUTO_RENEWAL_ENABLED
+  AUTO_RENEWAL_DISABLED
   CE_COMPLETED
   FOLLOW_UP_SENT
   BULK_GENERATED
+  BADGE_ENABLED
+  EXTRACTION_COMPLETED
 }
 
 enum SubscriptionStatus {
@@ -211,6 +223,12 @@ model User {
   darkMode            Boolean   @default(false)
   calendarToken       String?   @unique
 
+  // Public compliance badge (#2 Verified Compliant)
+  complianceScore       Int?       @default(0)
+  complianceScoreAt     DateTime?
+  publicBadgeEnabled    Boolean    @default(false)
+  publicBadgeSlug       String?    @unique
+
   tenant          Tenant?          @relation(fields: [tenantId], references: [id])
   businessProfile BusinessProfile?
   userRegulations UserRegulation[]
@@ -267,6 +285,31 @@ model BusinessProfile {
   bondAmount            String?
   bondProvider          String?
   bondExpiration        DateTime?
+
+  // Per-user branding for generated PDFs (logo + colors). Falls back to
+  // tenant defaults, then to RegsGuard, when fields are null.
+  logoUrl                 String?
+  brandPrimaryColor       String?  // hex e.g. "#1e40af"
+  brandSecondaryColor     String?
+  brandFooter             String?  @db.Text  // shown at bottom of every PDF
+
+  // Vendor portal pre-fill (#6) — common ISN/Avetta/Veriforce questionnaire fields
+  naicsCode               String?
+  dunsNumber              String?
+  yearsInBusiness         Int?
+  emrRating               Float?
+  oshaStats               Json?     // { year: 2025, dart: 0.5, trir: 1.2, fatalities: 0 }
+  safetyContactName       String?
+  safetyContactEmail      String?
+  safetyContactPhone      String?
+  wcCarrier               String?
+  wcPolicyNumber          String?
+  wcExpiration            DateTime?
+  glLimitPerOccurrence    Int?
+  glLimitAggregate        Int?
+  autoLiabilityLimit      Int?
+  umbrellaLimit           Int?
+
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
@@ -548,11 +591,18 @@ model FileUpload {
   filePath   String
   createdAt  DateTime @default(now())
 
+  // AI extraction (#1)
+  extractionStatus     ExtractionStatus @default(PENDING)
+  extractedData        Json?
+  extractedAt          DateTime?
+  extractionError      String?          @db.Text
+
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([documentId])
+  @@index([extractionStatus])
 }
 
 // ─── CE Credit Tracking ───

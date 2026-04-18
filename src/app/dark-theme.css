@@ -6,7 +6,7 @@
  * a toggle-driven class so users can control dark mode explicitly.
  */
 
-.dark {
+html.dark {
   --background: #0f172a;
   --foreground: #f8fafc;
   --primary: #3b82f6;
@@ -23,3 +23,19 @@
   --warning: #fbbf24;
   --danger: #f87171;
 }
+
+/* Hardcoded white/gray Tailwind utilities used in dashboard need dark equivalents */
+html.dark .bg-white { background-color: #1e293b !important; }
+html.dark .bg-gray-50 { background-color: #1e293b !important; }
+html.dark .bg-red-50 { background-color: #2a1414 !important; }
+html.dark .bg-orange-50 { background-color: #2a1f0a !important; }
+html.dark .bg-green-50 { background-color: #0a2415 !important; }
+html.dark .bg-blue-50 { background-color: #0a1a2a !important; }
+html.dark .text-gray-900 { color: #f8fafc !important; }
+html.dark .text-gray-800 { color: #e2e8f0 !important; }
+html.dark .text-gray-700 { color: #cbd5e1 !important; }
+html.dark .text-gray-600 { color: #94a3b8 !important; }
+html.dark .text-red-800 { color: #fca5a5 !important; }
+html.dark .text-orange-800 { color: #fdba74 !important; }
+html.dark .text-green-800 { color: #86efac !important; }
+html.dark .text-blue-800 { color: #93c5fd !important; }

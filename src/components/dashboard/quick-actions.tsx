@@ -24,7 +24,7 @@ export function QuickActions() {
     {
       label: "Generate PDF",
       icon: "file",
-      onClick: () => router.push("/documents/generate"),
+      onClick: () => router.push("/documents/new"),
       variant: "outline" as const,
     },
   ];

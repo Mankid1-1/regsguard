@@ -36,7 +36,19 @@ export async function POST(
     ? doc.data as Record<string, string>
     : {};
 
-  const { buffer, filename } = await generateDocumentPdf(doc.templateSlug, data, tenant);
+  const profile = await prisma.businessProfile.findUnique({ where: { userId: user.id } });
+  const userBranding = profile
+    ? {
+        businessName: profile.businessName,
+        logoUrl: profile.logoUrl,
+        brandPrimaryColor: profile.brandPrimaryColor,
+        brandSecondaryColor: profile.brandSecondaryColor,
+        brandFooter: profile.brandFooter,
+        supportEmail: profile.email,
+      }
+    : undefined;
+
+  const { buffer, filename } = await generateDocumentPdf(doc.templateSlug, data, tenant, userBranding);
 
   // Mark as generated
   await prisma.document.update({

@@ -3,6 +3,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface Deadline {
   id: string;
@@ -23,6 +24,7 @@ interface ComplianceInsightsProps {
 }
 
 export function ComplianceInsights({ deadlines, autoRenewalCount, totalRegulations }: ComplianceInsightsProps) {
+  const router = useRouter();
   const now = new Date();
   const thirtyDaysOut = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
   
@@ -54,6 +56,7 @@ export function ComplianceInsights({ deadlines, autoRenewalCount, totalRegulatio
       description: "Require immediate attention",
       type: "critical",
       action: criticalDeadlines.length > 0 ? "Review Now" : null,
+      href: "/regulations?filter=overdue",
     },
     {
       title: "Upcoming Deadlines",
@@ -61,6 +64,7 @@ export function ComplianceInsights({ deadlines, autoRenewalCount, totalRegulatio
       description: "Due within 30 days",
       type: "warning",
       action: upcomingDeadlines.length > 0 ? "Plan Ahead" : null,
+      href: "/regulations?filter=upcoming",
     },
     {
       title: "Compliance Rate",
@@ -68,6 +72,7 @@ export function ComplianceInsights({ deadlines, autoRenewalCount, totalRegulatio
       description: "Deadlines completed",
       type: complianceRate >= 80 ? "success" : complianceRate >= 60 ? "warning" : "critical",
       action: complianceRate < 80 ? "Improve" : null,
+      href: "/regulations",
     },
     {
       title: "Auto-Renewal Coverage",
@@ -75,6 +80,7 @@ export function ComplianceInsights({ deadlines, autoRenewalCount, totalRegulatio
       description: "Automated renewals",
       type: autoRenewalCoverage >= 70 ? "success" : autoRenewalCoverage >= 40 ? "warning" : "info",
       action: autoRenewalCoverage < 70 ? "Enable More" : null,
+      href: "/auto-renewal",
     },
   ];
 
@@ -113,7 +119,12 @@ export function ComplianceInsights({ deadlines, autoRenewalCount, totalRegulatio
               <h4 className="text-sm font-medium mt-2">{insight.title}</h4>
               <p className="text-xs text-muted-foreground">{insight.description}</p>
               {insight.action && (
-                <Button variant="outline" size="sm" className="mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => router.push(insight.href)}
+                >
                   {insight.action}
                 </Button>
               )}

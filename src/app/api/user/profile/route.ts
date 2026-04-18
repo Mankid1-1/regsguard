@@ -64,6 +64,10 @@ export async function PUT(request: NextRequest) {
       bondExpiration: data.bondExpiration
         ? new Date(data.bondExpiration)
         : null,
+      logoUrl: data.logoUrl || null,
+      brandPrimaryColor: data.brandPrimaryColor || null,
+      brandSecondaryColor: data.brandSecondaryColor || null,
+      brandFooter: data.brandFooter || null,
     };
 
     const profile = await prisma.businessProfile.upsert({

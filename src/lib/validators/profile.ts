@@ -23,6 +23,12 @@ export const businessProfileSchema = z.object({
   bondAmount: z.string().optional().default(""),
   bondProvider: z.string().optional().default(""),
   bondExpiration: z.string().optional().default(""),
+
+  // Branding for generated PDFs
+  logoUrl: z.string().optional().default(""),
+  brandPrimaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Use hex like #1e40af").optional().or(z.literal("")).default(""),
+  brandSecondaryColor: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Use hex like #1e40af").optional().or(z.literal("")).default(""),
+  brandFooter: z.string().max(500).optional().default(""),
 });
 
 export type BusinessProfileInput = z.infer<typeof businessProfileSchema>;

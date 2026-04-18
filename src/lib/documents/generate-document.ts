@@ -1,5 +1,6 @@
 import { withPage } from "@/lib/pdf/browser-pool";
 import { getTemplate } from "./templates/registry";
+import type { BrandingContext } from "./templates/registry";
 import type { TenantConfig } from "@/lib/tenant";
 import { tenantInitials } from "@/lib/tenant";
 
@@ -8,18 +9,37 @@ interface GenerateDocumentPdfResult {
   filename: string;
 }
 
+export interface UserBranding {
+  businessName?: string | null;
+  logoUrl?: string | null;
+  brandPrimaryColor?: string | null;
+  brandSecondaryColor?: string | null;
+  brandFooter?: string | null;
+  supportEmail?: string | null;
+}
+
 export async function generateDocumentPdf(
   templateSlug: string,
   data: Record<string, string>,
-  tenant?: TenantConfig
+  tenant?: TenantConfig,
+  userBranding?: UserBranding
 ): Promise<GenerateDocumentPdfResult> {
   const template = getTemplate(templateSlug);
   if (!template) throw new Error(`Template "${templateSlug}" not found`);
 
-  const brandName = tenant?.name ?? "RegsGuard";
-  const brandColor = tenant?.primaryColor ?? "#1e40af";
+  // Branding cascade: user overrides → tenant → RegsGuard defaults
+  const brandName = userBranding?.businessName || tenant?.name || "RegsGuard";
+  const brandColor =
+    userBranding?.brandPrimaryColor || tenant?.primaryColor || "#1e40af";
 
-  const html = template.generateHtml(data, brandName, brandColor);
+  const branding: BrandingContext = {
+    logoUrl: userBranding?.logoUrl ?? null,
+    footerText: userBranding?.brandFooter ?? null,
+    supportEmail: userBranding?.supportEmail ?? null,
+    secondaryColor: userBranding?.brandSecondaryColor ?? null,
+  };
+
+  const html = template.generateHtml(data, brandName, brandColor, branding);
 
   return withPage(async (page) => {
     await page.setContent(html, { waitUntil: "networkidle0" });

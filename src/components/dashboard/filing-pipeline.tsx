@@ -73,9 +73,14 @@ export function FilingPipeline({ deadlines }: { deadlines: PipelineDeadline[] })
                       {!d.regulation.officialEmail && d.regulation.portalUrl && (
                         <>
                           <span>&middot;</span>
-                          <span className="text-primary truncate">
+                          <a
+                            href={d.regulation.portalUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary truncate hover:underline"
+                          >
                             &rarr; Online portal
-                          </span>
+                          </a>
                         </>
                       )}
                     </div>

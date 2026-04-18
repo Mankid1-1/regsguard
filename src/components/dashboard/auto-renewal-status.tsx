@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface AutoRenewalConfig {
   id: string;
@@ -23,6 +24,7 @@ interface AutoRenewalStatusProps {
 }
 
 export function AutoRenewalStatus({ configs }: AutoRenewalStatusProps) {
+  const router = useRouter();
   const [showAll, setShowAll] = useState(false);
   
   const enabledConfigs = configs.filter(c => c.enabled);
@@ -45,7 +47,12 @@ export function AutoRenewalStatus({ configs }: AutoRenewalStatusProps) {
           <div className="text-center py-4">
             <div className="text-2xl mb-2">0</div>
             <p className="text-sm text-muted-foreground">Auto-renewals enabled</p>
-            <Button variant="outline" size="sm" className="mt-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={() => router.push("/auto-renewal")}
+            >
               Enable Auto-Renewal
             </Button>
           </div>

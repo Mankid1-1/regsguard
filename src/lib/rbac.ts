@@ -117,9 +117,43 @@ const ROLE_PERMISSIONS: Record<Role, readonly string[]> = {
     PERMISSIONS.VIEW_PROJECTS,
   ],
 
+  // OFFICE_MANAGER: spouse / paperwork-helper role.
+  // Compliance docs + deadlines + renewals, but no billing,
+  // no team management, no PII like SSN/payment data.
+  OFFICE_MANAGER: [
+    PERMISSIONS.VIEW_DOCUMENTS,
+    PERMISSIONS.MANAGE_DOCUMENTS,
+    PERMISSIONS.VIEW_DEADLINES,
+    PERMISSIONS.MANAGE_DEADLINES,
+    PERMISSIONS.VIEW_REGULATIONS,
+    PERMISSIONS.MANAGE_REGULATIONS,
+    PERMISSIONS.VIEW_PROJECTS,
+    PERMISSIONS.VIEW_CLIENTS,
+    PERMISSIONS.UPLOAD_PHOTOS,
+    PERMISSIONS.ADD_NOTES,
+    PERMISSIONS.EXPORT_REPORTS,
+  ],
+
   // USER: backwards-compatible — same as OWNER
   USER: ALL_PERMISSIONS,
 };
+
+// Fields the role is NOT allowed to see on User/BusinessProfile records.
+// Strip these in API responses before returning to the client.
+const ROLE_PII_BLOCKLIST: Partial<Record<Role, readonly string[]>> = {
+  OFFICE_MANAGER: ["taxId", "ssn", "paymentMethodId", "stripeCustomerId"],
+  FIELD_WORKER: ["taxId", "ssn", "paymentMethodId", "stripeCustomerId", "bondAmount"],
+};
+
+export function stripPII<T extends Record<string, unknown>>(role: Role, record: T): T {
+  const blocked = ROLE_PII_BLOCKLIST[role];
+  if (!blocked || blocked.length === 0) return record;
+  const cleaned = { ...record };
+  for (const field of blocked) {
+    if (field in cleaned) (cleaned as Record<string, unknown>)[field] = null;
+  }
+  return cleaned;
+}
 
 // ─── Public API ───
 
