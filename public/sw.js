@@ -1,9 +1,11 @@
-const CACHE_NAME = "regsguard-v3";
+const CACHE_NAME = "regsguard-v4";
 const OFFLINE_URL = "/offline";
 
-// Assets to cache on install (app shell)
+// Assets to cache on install (app shell only — icons and offline page).
+// Never precache HTML routes or _next chunks; those change on every deploy
+// and stale copies cause "Refused to execute script... MIME type text/html"
+// errors when the old chunk hash doesn't exist anymore.
 const PRECACHE_ASSETS = [
-  "/",
   "/offline",
   "/manifest.webmanifest",
   "/icons/icon-192x192.svg",
@@ -52,6 +54,13 @@ self.addEventListener("fetch", (event) => {
   // API requests: network only (don't cache sensitive data)
   if (url.pathname.startsWith("/api/")) return;
 
+  // Never intercept Next.js build output. Next uses content-hashed
+  // filenames (immutable, already optimally cached by the browser), and
+  // intercepting them here causes deploy-skew bugs where an old chunk
+  // hash in cache is served back to a new HTML that expects a different
+  // hash (or vice versa), producing MIME-type errors on next-deploy.
+  if (url.pathname.startsWith("/_next/")) return;
+
   // Navigation requests: network first, fall back to offline page
   if (request.mode === "navigate") {
     event.respondWith(
@@ -62,14 +71,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets: stale-while-revalidate
+  // Icons/images only -- safe to cache long-term since they're in /public
   if (
-    url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
     url.pathname.endsWith(".svg") ||
-    url.pathname.endsWith(".png") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname.endsWith(".js")
+    url.pathname.endsWith(".png")
   ) {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>

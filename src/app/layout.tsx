@@ -8,6 +8,7 @@ import { ServiceWorkerRegister } from "@/components/providers/sw-register";
 import { AnalyticsProvider } from "@/components/providers/analytics-provider";
 import { ToastProvider } from "@/components/ui/toast";
 import { CookieConsent } from "@/components/layout/cookie-consent";
+import { ChunkErrorBoundary } from "@/components/chunk-error-boundary";
 import { getTenantFromHeaders } from "@/lib/tenant.server";
 import "./globals.css";
 
@@ -72,6 +73,7 @@ export default async function RootLayout({
             <ServiceWorkerRegister />
             <AnalyticsProvider />
             <CookieConsent />
+            <ChunkErrorBoundary />
           </ToastProvider>
         </ClerkProvider>
       </body>
