@@ -6,8 +6,8 @@ import { verifyLicense, verifyLicensesBatch, getVerificationConfiguration } from
 import { z } from "zod";
 
 const verifySchema = z.object({
-  state: z.enum(["MN", "WI"], "State must be MN or WI"),
-  trade: z.enum(["CONTRACTOR", "ELECTRICAL", "PLUMBING", "HVAC"], "Trade is required"),
+  state: z.string().length(2, "State must be a 2-letter code"),
+  trade: z.string().min(1, "Trade is required"),
   licenseNumber: z.string().min(1, "License number is required"),
   licenseType: z.string().optional(),
 });
