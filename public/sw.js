@@ -4,9 +4,8 @@ const OFFLINE_URL = "/offline";
 // Assets to cache on install (app shell)
 const PRECACHE_ASSETS = [
   "/",
-  "/dashboard",
   "/offline",
-  "/manifest.json",
+  "/manifest.webmanifest",
   "/icons/icon-192x192.svg",
   "/icons/icon-512x512.svg",
 ];

@@ -9,7 +9,7 @@ const enableRenewalSchema = z.object({
   regulationId: z.string(),
   autoPay: z.boolean().optional(),
   paymentMethodId: z.string().optional(),
-  digitalSignature: z.record(z.any()).optional(),
+  digitalSignature: z.record(z.string(), z.any()).optional(),
 });
 
 // GET: Get auto-renewal status for user

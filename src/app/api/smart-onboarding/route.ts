@@ -14,7 +14,7 @@ const onboardingSchema = z.object({
   phone: validationSchemas.phone,
   email: validationSchemas.email,
   responsiblePerson: z.string().min(1, "Responsible person is required"),
-  licenseNumbers: z.record(z.string()).optional(),
+  licenseNumbers: z.record(z.string(), z.string()).optional(),
 });
 
 export async function POST(request: NextRequest) {
