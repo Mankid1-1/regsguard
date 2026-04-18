@@ -130,6 +130,6 @@ export async function getReferralStats(userId: string) {
     nextMilestone: 3 - (conversions % 3),
     freeMonthsEarned,
     freeMonthsRemaining,
-    shareUrl: `https://regsguard.vercel.app/signup?ref=${referralLink.code}`,
+    shareUrl: `https://regsguard.rebooked.org/signup?ref=${referralLink.code}`,
   };
 }

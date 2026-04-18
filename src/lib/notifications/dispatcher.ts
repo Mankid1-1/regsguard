@@ -69,7 +69,7 @@ export async function dispatchNotification(
           <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px">
             <h2 style="color:#1a1a1a;margin:0 0 8px">${title}</h2>
             <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 20px">${body}</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://regsguard.vercel.app"}/dashboard"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://regsguard.rebooked.org"}/dashboard"
                style="display:inline-block;background:#2563eb;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600">
               Open Dashboard
             </a>

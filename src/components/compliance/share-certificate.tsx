@@ -23,11 +23,11 @@ export function ShareCertificate({
 }: ShareCertificateProps) {
   const [copied, setCopied] = useState(false);
 
-  const certificateText = `I just verified my compliance status with RegsGuard: ${score}% for ${trade} in ${state}. Automated compliance tracking means fewer late fees and more time on the job. Check it out → https://regsguard.vercel.app`;
+  const certificateText = `I just verified my compliance status with RegsGuard: ${score}% for ${trade} in ${state}. Automated compliance tracking means fewer late fees and more time on the job. Check it out → https://regsguard.rebooked.org`;
 
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=https://regsguard.vercel.app`;
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=https://regsguard.vercel.app`;
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(certificateText)}&url=https://regsguard.vercel.app`;
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=https://regsguard.rebooked.org`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=https://regsguard.rebooked.org`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(certificateText)}&url=https://regsguard.rebooked.org`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(certificateText)}`;
 
   function copyToClipboard() {

@@ -271,36 +271,45 @@ export class HealthMonitor {
    */
   private static async checkCronJobs(): Promise<HealthCheck> {
     const startTime = Date.now();
-    
+
     try {
-      // Check recent cron job executions
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      const recentLogs = await prisma.complianceLog.findMany({
-        where: {
-          action: 'DEADLINE_CHECK',
-          createdAt: { gte: oneHourAgo },
-        },
-        take: 5,
-      });
+      // The daily deadline-checker cron updates lastNotifiedAt on every
+      // deadline it processes. If nothing's been processed in 25 hours
+      // (one full day + buffer), cron is likely broken. Absence of recent
+      // activity when there are no due-soon deadlines is still fine.
+      const oneDayAgo = new Date(Date.now() - 25 * 60 * 60 * 1000);
+      const [recentProcessed, totalActiveDeadlines] = await Promise.all([
+        prisma.userDeadline.findFirst({
+          where: { lastNotifiedAt: { gte: oneDayAgo } },
+          orderBy: { lastNotifiedAt: "desc" },
+          select: { lastNotifiedAt: true, id: true },
+        }),
+        prisma.userDeadline.count({
+          where: { status: { notIn: ["COMPLETED", "SKIPPED"] } },
+        }),
+      ]);
 
       const responseTime = Date.now() - startTime;
-      const status = recentLogs.length > 0 ? 'healthy' : 'degraded';
+      // healthy: processed recently, OR there's nothing to process
+      // degraded: active deadlines exist but nothing processed in 25h
+      const status: HealthCheck["status"] =
+        recentProcessed || totalActiveDeadlines === 0 ? "healthy" : "degraded";
 
       return {
-        service: 'cron-jobs',
+        service: "cron-jobs",
         status,
         responseTime,
         lastChecked: new Date(),
         details: {
-          recentExecutions: recentLogs.length,
-          lastExecution: recentLogs[0]?.createdAt,
+          lastProcessed: recentProcessed?.lastNotifiedAt ?? null,
+          activeDeadlines: totalActiveDeadlines,
         },
       };
     } catch (error) {
       return {
-        service: 'cron-jobs',
-        status: 'down',
-        error: error instanceof Error ? error.message : 'Cron job check failed',
+        service: "cron-jobs",
+        status: "down",
+        error: error instanceof Error ? error.message : "Cron job check failed",
         lastChecked: new Date(),
         responseTime: Date.now() - startTime,
       };

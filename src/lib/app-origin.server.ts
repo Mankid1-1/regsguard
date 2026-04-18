@@ -11,9 +11,9 @@ export function getAppOrigin(): string {
     return env.trim();
   }
 
-  // Production fallback: use canonical Vercel host
+  // Production fallback: canonical custom domain
   if (process.env.NODE_ENV === "production") {
-    return "https://regsguard.vercel.app";
+    return "https://regsguard.rebooked.org";
   }
 
   // Development fallback

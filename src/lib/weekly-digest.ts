@@ -200,7 +200,7 @@ export function renderWeeklyDigestEmail(data: WeeklyDigestData): string {
 
     <div class="footer">
       <p>RegsGuard • Compliance Autopilot for Contractors</p>
-      <p><a href="https://regsguard.vercel.app/preferences" style="color: #9ca3af;">Manage Preferences</a></p>
+      <p><a href="https://regsguard.rebooked.org/preferences" style="color: #9ca3af;">Manage Preferences</a></p>
     </div>
   </div>
 </body>

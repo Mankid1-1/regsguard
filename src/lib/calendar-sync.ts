@@ -44,12 +44,12 @@ END:VTIMEZONE\n`;
     const alertStr = alertTime.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
     ics += `BEGIN:VEVENT
-UID:regsguard-${d.id}@regsguard.vercel.app
+UID:regsguard-${d.id}@regsguard.rebooked.org
 DTSTAMP:${now}
 DTSTART;TZID=America/Chicago:${due.toISOString().replace(/[-T:]/g, "").split(".")[0]}
 SUMMARY:${d.regulation.title} Due
-DESCRIPTION:${d.regulation.title} deadline\\n\\nAuthority: ${d.regulation.authority}\\n\\nGenerate and file at https://regsguard.vercel.app
-LOCATION:https://regsguard.vercel.app
+DESCRIPTION:${d.regulation.title} deadline\\n\\nAuthority: ${d.regulation.authority}\\n\\nGenerate and file at https://regsguard.rebooked.org
+LOCATION:https://regsguard.rebooked.org
 CATEGORIES:Compliance,RegsGuard
 STATUS:CONFIRMED
 TRANSP:TRANSPARENT
@@ -67,7 +67,7 @@ END:VEVENT\n`;
 }
 
 export function getCalendarSubscriptionUrl(userId: string): string {
-  return `https://regsguard.vercel.app/api/calendar/ics/${userId}`;
+  return `https://regsguard.rebooked.org/api/calendar/ics/${userId}`;
 }
 
 export function getGoogleCalendarAddUrl(userId: string): string {

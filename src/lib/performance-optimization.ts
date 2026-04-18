@@ -330,11 +330,14 @@ export class BackgroundProcessor {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    // Clean up old compliance logs
+    // Clean up old PDF-generation log entries. These are routine generation
+    // metadata and safe to purge after retention window. EMAIL_SENT,
+    // DEADLINE_COMPLETED, and other audit-relevant actions are kept for
+    // compliance trail integrity.
     const deletedLogs = await prisma.complianceLog.deleteMany({
       where: {
         createdAt: { lt: cutoffDate },
-        action: 'DEADLINE_CHECK', // Only cleanup automated logs
+        action: "PDF_GENERATED",
       },
     });
 
