@@ -61,6 +61,8 @@ export function CommandPalette() {
     { id: "nav-ce", group: "Navigate", label: "CE Credits", description: "Continuing education", icon: <IconBook />, keywords: ["training", "hours"], action: () => navigate("/ce-credits") },
     { id: "nav-expenses", group: "Navigate", label: "Expenses", description: "Business costs", icon: <IconDollar />, keywords: ["billing", "money"], action: () => navigate("/expenses") },
     { id: "nav-compliance", group: "Navigate", label: "Compliance Log", description: "Filing audit trail", icon: <IconHistory />, keywords: ["audit", "history"], action: () => navigate("/compliance") },
+    { id: "nav-share", group: "Navigate", label: "Share Badge", description: "Compliance badge for your website", icon: <IconShield />, keywords: ["badge", "verified", "embed"], action: () => navigate("/share") },
+    { id: "nav-refer", group: "Navigate", label: "Refer & Earn", description: "3 referrals = 1 free month", icon: <IconSparkles />, keywords: ["referral", "invite", "free"], action: () => navigate("/refer") },
     { id: "nav-settings", group: "Navigate", label: "Settings", description: "Account & preferences", icon: <IconSettings />, action: () => navigate("/settings") },
     // Create
     { id: "create-doc", group: "Create", label: "New Document", description: "Generate paperwork", icon: <IconPlus />, keywords: ["pdf", "form", "generate"], action: () => navigate("/documents/new"), shortcut: "⌘D" },
